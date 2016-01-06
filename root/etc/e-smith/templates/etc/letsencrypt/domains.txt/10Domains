@@ -1,0 +1,57 @@
+#!/usr/bin/perl -w
+
+{
+    use strict;
+    use warnings;
+    use esmith::ConfigDB;
+
+    my $configDB  = esmith::ConfigDB->open_ro            or die("can't open Config DB");
+    my $domainsDB = esmith::ConfigDB->open_ro('domains') or die("can't connect to domains database");
+    my $hostsDB   = esmith::ConfigDB->open_ro('hosts')   or die("can't connect to hosts database");
+
+    # my $dbKey     = 'domain';
+
+    #    my $systemMode = $configDB->get("SystemMode")->value;
+
+    #    if ( $systemMode ne 'servergateway' ) {
+    #        $OUT .= "# System not in Server Gateway mode\n";
+    #    }
+
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
+
+    if ( $letsencryptStatus eq 'enabled' ) {
+
+        # This should get all the connections in an array
+
+        my @domains = $domainsDB->keys;
+
+        print "@domains";
+
+        # First get all the domains
+
+        foreach my $domain (@domains) {
+
+            $OUT .= "$domain ";
+
+        }
+
+        my @hosts = $hostsDB->keys;
+        foreach my $host (@hosts) {
+
+            # print "$host\n";
+
+            # Are we self ?
+            my $type = $hostsDB->get_prop( "$host", 'HostType' );
+
+            # print "$type\n";
+
+            # print "$host  $type\n";
+
+            if ( $type eq 'Self' ) {
+            print "$host  $type\n";
+                $OUT .= "$host ";
+
+            }
+        }
+    }
+}
