@@ -25,33 +25,54 @@
 
         my @domains = $domainsDB->keys;
 
-        print "@domains";
+        print "@domains\n";
 
         # First get all the domains
 
         foreach my $domain (@domains) {
 
-            $OUT .= "$domain ";
+            my $domainEnabled = $domainsDB->get_prop( "$domain", 'letsencryptSSLcert' ) || 'disabled';
 
-        }
+            if ( $domainEnabled eq 'enabled' ) {
 
-        my @hosts = $hostsDB->keys;
-        foreach my $host (@hosts) {
+                #code
 
-            # print "$host\n";
+                $OUT .= "$domain ";
 
-            # Are we self ?
-            my $type = $hostsDB->get_prop( "$host", 'HostType' );
+                # Now check for hosts
 
-            # print "$type\n";
+                my @hosts = $hostsDB->keys;
 
-            # print "$host  $type\n";
+                foreach my $fqdn (@hosts) {
 
-            if ( $type eq 'Self' ) {
-            print "$host  $type\n";
-                $OUT .= "$host ";
+                    # Lets get the hostname
+                    my $hostname = $fqdn;
+                    $hostname =~ s/\..*//;
+                    print "$hostname\n";
+
+                    # Lets get the domain name
+                    my $domainname = $fqdn;
+                    $domainname =~ s/.*?\.//;
+                    print "$domainname\n";
+
+                    # is the domain name from the hosts file the same as that in the domains file ?
+                    my $hostEnabled = $hostsDB->get_prop( "$fqdn", 'letsencryptSSLcert' ) || 'disabled';
+                    
+                    if ( $domainname eq $domain && $hostEnabled eq 'enabled') {
+
+                        # Are we self ?
+                        my $type = $hostsDB->get_prop( "$fqdn", 'HostType' );
+
+                        if ( $type eq 'Self' ) {
+                            print "$fqdn  $type\n";
+                            $OUT .= "$fqdn ";
+
+                        }
+                    }
+                }
 
             }
+
         }
     }
 }
