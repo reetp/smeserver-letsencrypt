@@ -1,14 +1,13 @@
 #! /usr/bin/perl -w
 
-# Need some thought on when the templates should be expanded and when the action should be called.
-
 use esmith::Build::CreateLinks qw(:all);
-my $event = "ipsec-update";
+# my $event = "letsencrypt-update";
 
-# ipsec-update
+# letsencrypt-update
 
 foreach (qw(
        /etc/letsencrypt/domains.txt
+       /usr/local/etc/letsencrypt.sh/config.sh
     ))
 {
     templates2events("$_", qw(
@@ -16,6 +15,12 @@ foreach (qw(
     console-save
     bootstrap-console-save
     remoteaccess-update
+    domain-create
+    domain-delete
+    domain-modify
+    host-create
+    host-delete
+    host-modify 
     ));
 }
 
