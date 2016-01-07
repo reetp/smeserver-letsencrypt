@@ -17,7 +17,7 @@
 
     my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
 
-    if ( $letsencryptStatus eq 'enabled' ) {
+    if ( ( $letsencryptStatus eq 'enabled' ) || ( $letsencryptStatus eq 'test' ) ) {
 
         # This should get all the connections in an array
 
@@ -46,23 +46,26 @@
                     # Lets get the hostname
                     my $hostname = $fqdn;
                     $hostname =~ s/\..*//;
+
                     # print "$hostname\n";
 
                     # Lets get the domain name
                     my $domainname = $fqdn;
                     $domainname =~ s/.*?\.//;
+
                     # print "$domainname\n";
 
                     # is the domain name from the hosts file the same as that in the domains file ?
                     my $hostEnabled = $hostsDB->get_prop( "$fqdn", 'letsencryptSSLcert' ) || 'disabled';
-                    
-                    if ( $domainname eq $domain && $hostEnabled eq 'enabled') {
+
+                    if ( $domainname eq $domain && $hostEnabled eq 'enabled' ) {
 
                         # Are we self ?
                         my $type = $hostsDB->get_prop( "$fqdn", 'HostType' );
 
                         if ( $type eq 'Self' ) {
-                         #   print "$fqdn  $type\n";
+
+                            #   print "$fqdn  $type\n";
                             $OUT .= "$fqdn ";
 
                         }
@@ -73,4 +76,7 @@
 
         }
     }
+else {    
+    $OUT .= "# letsencrypt is disabled\n";
+}
 }
