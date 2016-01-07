@@ -76,7 +76,7 @@
 
         }
     }
-else {    
-    $OUT .= "# letsencrypt is disabled\n";
-}
+    else {
+        $OUT .= "# letsencrypt is disabled\n";
+    }
 }
