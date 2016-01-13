@@ -6,8 +6,8 @@ use esmith::Build::CreateLinks qw(:all);
 # letsencrypt-update
 
 foreach (qw(
-       /etc/letsencrypt/domains.txt
-       /usr/local/etc/letsencrypt.sh/config.sh
+       /etc/letsencrypt.sh/domains.txt
+       /etc/letsencrypt.sh/config.sh
     ))
 {
     templates2events("$_", qw(
