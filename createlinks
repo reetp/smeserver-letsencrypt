@@ -24,4 +24,11 @@ foreach (qw(
     ));
 }
 
-
+foreach (qw(
+    /etc/cron.daily/letsencrypt
+    ))
+{
+    templates2events("$_", qw(
+    http-proxy-update
+    bootstrap-console-save
+}
