@@ -1,0 +1,49 @@
+{
+    use strict;
+    use warnings;
+    use esmith::ConfigDB;
+
+    my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
+
+    $OUT .= "#!/bin/bash\n";
+
+    $OUT .= "WELLKNOWN=/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\n";
+
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
+
+    if ( $letsencryptStatus eq 'test' ) {
+
+        # Use staging directory for testing
+        # Once you are sure you have the settings right then change
+        $OUT .= "CA=\"https://acme-staging.api.letsencrypt.org/directory\"\n";
+    }
+
+    elsif ( $letsencryptStatus ne 'test' ) {
+
+        # Real server - default setting in the the main file
+        # Only use this once you are sure things are OK or you will hit a rate limit.
+        $OUT .= "CA=\"https://acme-v01.api.letsencrypt.org/directory\"\n";
+    }
+
+    # Base directory for account key, generated certificates and list of domains (default: $SCRIPTDIR -- uses config directory if undefined)
+    #BASEDIR=$SCRIPTDIR
+    $OUT .= "BASEDIR=\"/etc/letsencrypt\"\n";
+
+    # Location of private account key (default: $BASEDIR/private_key.pem)
+    #PRIVATE_KEY="${BASEDIR}/private_key.pem"
+
+    my $letsencryptKeysize = $configDB->get_prop( 'letsencrypt', 'keysize' ) || '';
+    if ( $letsencryptKeysize ne '' ) {
+
+        # Default keysize for private keys (default: 4096)
+        $OUT .= "KEYSIZE=\"4096\"\n";
+    }
+    
+    my $letsencryptEmail = $configDB->get_prop( 'letsencrypt', 'email' ) || '';
+    if ( $letsencryptEmail ne '' ) {
+
+        # E-mail to use during the registration (default: <unset>)
+        $OUT .= "CONTACT_EMAIL=$letsencryptEmail\n";
+    }
+
+}
