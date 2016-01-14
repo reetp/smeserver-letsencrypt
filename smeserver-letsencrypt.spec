@@ -54,8 +54,10 @@ rm -rf %{name}-%{version}
 %preun
 
 %post
-if [[ ! -e /etc/letsencrypt.sh ]]; then
-    mkdir /etc/letsencrypt.sh
+if [[ ! -e /etc/letsencrypt.sh ]];
+then mkdir /etc/letsencrypt.sh;
+fi
+
 echo "After install please set your db keys"
 echo "Make sure you set the letsencrypt status key to test"
 echo "Set the modSSL keys"
@@ -66,4 +68,5 @@ echo "letsencrypt.sh -c create new certs"
 echo "Once you are satisfied set the status key to enabled"
 echo "run the letesencypt.sh file again to generate you keys"
 echo "change your status back to test"
+
 %postun
