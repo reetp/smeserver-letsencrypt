@@ -12,9 +12,9 @@ This can have one of 3 states. Make sure you set to test until you are sure of y
 
 config set letsencrypt service status disabled
 
-config setprop letsencypt status disabled | enabled | test 
-config setprop letsencypt email (defaults to empty) 
-config setprop letsencypt keysize (defaults to 4096) 
+config setprop letsencypt status disabled | enabled | test  
+config setprop letsencypt email (defaults to empty)  
+config setprop letsencypt keysize (defaults to 4096)  
 
 
 Set these keys to your primary domain
