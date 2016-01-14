@@ -27,7 +27,7 @@
 
     # Base directory for account key, generated certificates and list of domains (default: $SCRIPTDIR -- uses config directory if undefined)
     #BASEDIR=$SCRIPTDIR
-    $OUT .= "BASEDIR=\"/etc/letsencrypt\"\n";
+    $OUT .= "BASEDIR=\"/etc/letsencrypt.sh\"\n";
 
     # Location of private account key (default: $BASEDIR/private_key.pem)
     #PRIVATE_KEY="${BASEDIR}/private_key.pem"
