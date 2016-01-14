@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 4
+%define release 5
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,6 +19,9 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
+* Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-5
+- Modify spec file to add paths and set permisssions
+
 * Thu Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-4
 - Modify file paths and cron script
 
@@ -65,17 +68,25 @@ if [[ ! -e /etc/letsencrypt.sh ]];
 then mkdir /etc/letsencrypt.sh;
 fi
 
-echo "###########################################################"
+if [[ ! -e /home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge ]];
+then mkdir -p /home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge;
+fi
+
+chmod -R 0775  /home/e-smith/files/ibays/Primary/html/.well-known
+chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
+
+
+echo "###################################################################"
 echo "# After install please set your db keys"
 echo "# Make sure you set the letsencrypt status key to test"
 echo "# Set the modSSL keys"
 echo "# Enable some domains and hosts"
 echo "# Then run the following"
 echo "# signal-event console-save"
-echo "# letsencrypt.sh -c create new certs"
-echo "# Once you are satisfied set the status key to enabled"
-echo "# run the letesencypt.sh file again to generate you keys"
-echo "# change your status back to test"
-echo "###########################################################"
+echo "# letsencrypt.sh -c"
+echo "# Once you are satisfied set the letsencrypt status key to enabled"
+echo "# Run the letesencypt.sh file again to generate your keys"
+echo "# Change your letsencrypt status key back to test"
+echo "###################################################################"
 
 %postun
