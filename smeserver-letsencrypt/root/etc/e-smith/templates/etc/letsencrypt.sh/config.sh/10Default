@@ -48,6 +48,6 @@
 
     my $letsencryptHook = $configDB->get_prop( 'letsencrypt', 'hookScript' ) || 'disabled';
     if ( $letsencryptHook eq 'enabled' ) {
-        $OUT .= "HOOK=\"/usr/local/bin/hookscript.sh\"\n";
+        $OUT .= "HOOK=\"/usr/local/bin/hook-script.sh\"\n";
     }
 }
