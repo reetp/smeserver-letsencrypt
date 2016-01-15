@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 8
+%define release 9
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,17 +19,20 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
-* Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-8
+* Sat Jan 16 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-9
+- Add latest revision of letsencrypt.sh
+
+* Fri Jan 15 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-8
 - set +x on hook-script and correct file name in config
 
-* Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-7
+* Fri Jan 15 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-7
 - Add missing curly brace
 - Move Status check line up so we can generate empty file if disabled
 
-* Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-6
+* Fri Jan 15 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-6
 - Add hookScript key
 
-* Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-5
+* Fri Jan 15 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-5
 - Modify spec file to add paths and set permisssions
 
 * Thu Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-4
