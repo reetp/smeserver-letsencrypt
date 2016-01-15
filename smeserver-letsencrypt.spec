@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 5
+%define release 6
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,6 +19,9 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
+* Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-6
+- Add hookScript key
+
 * Fri Jan 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-5
 - Modify spec file to add paths and set permisssions
 
