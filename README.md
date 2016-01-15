@@ -25,8 +25,12 @@ db configuration setprop modSSL CertificateChainFile /etc/letsencrypt.sh/certs/{
 Per domain 
 db domains setprop mydomain.com letsencryptSSLcert enabled
 
-Per host
+Per host (domain has to be enabled first)
 db hosts setprop www.mydomain.com letsencryptSSLcert enabled
+
+If you want a hook script to push changes
+edit /usr/local/bin/hook-script.sh
+db configuration setprop letsencrypt hookScript enabled
 
 Expanding templates
 expand-template expand-template /etc/letsencrypt.sh/domains.txt
