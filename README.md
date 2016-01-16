@@ -40,7 +40,10 @@ expand-template /etc/letsencrypt.sh/config.sh
 cat /etc/letsencrypt.sh/config.sh
 
 Create or test create certificates (files is in the path so should be OK)
-config show 
 
+  /sbin/e-smith/signal-event domain-modify
+  /sbin/e-smith/signal-event email-update
+  /sbin/e-smith/signal-event ibay-modify
+  
 ToDo
 
