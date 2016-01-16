@@ -41,9 +41,9 @@ cat /etc/letsencrypt.sh/config.sh
 
 Create or test create certificates (files is in the path so should be OK)
 
-  /sbin/e-smith/signal-event domain-modify
-  /sbin/e-smith/signal-event email-update
-  /sbin/e-smith/signal-event ibay-modify
+  /sbin/e-smith/signal-event domain-modify  
+  /sbin/e-smith/signal-event email-update  
+  /sbin/e-smith/signal-event ibay-modify  
   
 ToDo
 
