@@ -49,13 +49,13 @@
         else {
             $OUT .= "# hookScript: Not Set\n";
         }
-        
+
         if ( $host ne '' ) {
             $OUT .= "# host: $host\n";
         }
         else {
             $OUT .= "# host: Not Set\n";
-        }        
+        }
 
         if ( $user ne '' ) {
             $OUT .= "# user: $user\n";
@@ -70,8 +70,7 @@
         else {
             $OUT .= "# path: Not Set\n";
         }
-        
-
 
     }
+
 }

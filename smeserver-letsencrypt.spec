@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 9
+%define release 10
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,6 +19,10 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
+* Sun Jan 17 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-10
+- Add latest revision of letsencrypt.sh
+- add hookscript.sh templates and various fixes
+
 * Sat Jan 16 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-9
 - Add latest revision of letsencrypt.sh
 
@@ -88,6 +92,10 @@ fi
 chmod -R 0775  /home/e-smith/files/ibays/Primary/html/.well-known
 chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 
+if [[ ! -e /usr/local/bin/hook-script.sh]]; then
+touch /usr/local/bin/hook-script.sh
+chmod 0755 /usr/local/bin/hook-script.sh
+fi
 
 echo "###################################################################"
 echo "# After install please set your db keys"
