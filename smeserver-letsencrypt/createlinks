@@ -8,19 +8,13 @@ use esmith::Build::CreateLinks qw(:all);
 foreach (qw(
        /etc/letsencrypt.sh/domains.txt
        /etc/letsencrypt.sh/config.sh
+       /usr/local/bin/hook-script.sh
     ))
 {
     templates2events("$_", qw(
     post-upgrade
     console-save
     bootstrap-console-save
-    remoteaccess-update
-    domain-create
-    domain-delete
-    domain-modify
-    host-create
-    host-delete
-    host-modify 
     ));
 }
 
