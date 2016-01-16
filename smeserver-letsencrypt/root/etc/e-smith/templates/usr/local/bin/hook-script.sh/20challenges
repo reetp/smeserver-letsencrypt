@@ -1,0 +1,77 @@
+{
+    use strict;
+    use warnings;
+    use esmith::ConfigDB;
+
+    my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
+
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )     || 'disabled';
+    my $hookscript        = $configDB->get_prop( 'letsencrypt', 'hookScript' ) || 'disabled';
+    my $host              = $configDB->get_prop( 'letsencrypt', 'host' )       || '';
+    my $user              = $configDB->get_prop( 'letsencrypt', 'user' )       || '';
+    my $path              = $configDB->get_prop( 'letsencrypt', 'path' )       || '';
+
+    if ( $letsencryptStatus ne 'disabled' && $hookscript eq 'enabled' && $host ne '' && $user ne '' && $path ne '' ) {
+
+        $OUT .= "if [ \$1 = \"deploy_challenge\" ]; then\n";
+        $OUT .= "  CHALLENGE_FILE=\$3\n";
+        $OUT .= "  CHALLENGE_CONTENT=\$4\n";
+        $OUT .= "  HOST=\"$host\" # FQDN or IP of public-facing server\n";
+        $OUT .= "  USER=\"$user\" # username on public-facing server\n";
+        $OUT .= "  REMOTE_PATH=\"$path\"\n";
+        $OUT .= "  if scp \$WELLKNOWN/\$CHALLENGE_FILE \$USER@\$HOST:\$REMOTE_PATH/\$CHALLENGE_FILE; then\n";
+        $OUT .= "    exit 0\n";
+        $OUT .= "  else\n";
+        $OUT .= "    echo \" Failed to deploy challenge !\" \n ";
+        $OUT .= " exit 1 \n ";
+        $OUT .= " fi \n ";
+        $OUT .= "fi \n ";
+        $OUT .= "\n";
+        $OUT .= " if [ \$1 = \"clean_challenge\" ]; then\n";
+        $OUT .= "  CHALLENGE_FILE=\$3\n";
+        $OUT .= "  HOST=\"$host\" # FQDN or IP of public-facing server\n";
+        $OUT .= "  USER=\"$user\" # username on public-facing server\n";
+        $OUT .= "  REMOTE_PATH=\"$path\"\n";
+        $OUT .= "  if ssh \$USER\@\$HOST \"rm \$REMOTE_PATH/\$CHALLENGE_FILE\"; then\n";
+        $OUT .= "    exit 0\n";
+        $OUT .= "  else\n";
+        $OUT .= "    echo \" Failed to clean challenge !\" \n ";
+        $OUT .= " exit 1 \n ";
+        $OUT .= " fi \n ";
+        $OUT .= "fi \n ";
+    }
+    else {
+        $OUT .= "# The following all have to be set to enable deploy/clean challenges\n";
+        $OUT .= "# \n";
+        if ( $hookscript ne '' ) {
+            $OUT .= "# hookScript: $hookscript\n";
+        }
+        else {
+            $OUT .= "# hookScript: Not Set\n";
+        }
+        
+        if ( $host ne '' ) {
+            $OUT .= "# host: $host\n";
+        }
+        else {
+            $OUT .= "# host: Not Set\n";
+        }        
+
+        if ( $user ne '' ) {
+            $OUT .= "# user: $user\n";
+        }
+        else {
+            $OUT .= "# user: Not Set\n";
+        }
+
+        if ( $path ne '' ) {
+            $OUT .= "# path: $path\n";
+        }
+        else {
+            $OUT .= "# path: Not Set\n";
+        }
+        
+
+
+    }
+}

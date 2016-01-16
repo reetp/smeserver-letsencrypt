@@ -1,0 +1,28 @@
+{
+    use strict;
+    use warnings;
+    use esmith::ConfigDB;
+
+    my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
+
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )     || 'disabled';
+
+    if ( $letsencryptStatus eq 'enabled' ) {
+
+        $OUT .= "#!/bin/bash\n";
+        $OUT .= "# deploy_cert hook will set config database entries to put to cert files\n";
+        $OUT .= "# and restart appropriate services\n";
+        $OUT .= "#\n";
+        $OUT .= "if [ \$1 = \" deploy_cert \" ]; then\n";
+        $OUT .= "  KEY=\$3\n";
+        $OUT .= "  CERT=\$4\n";
+        $OUT .= "  CHAIN=\${5/fullchain.pem/chain.pem}\n";
+        $OUT .= "  /sbin/e-smith/db configuration setprop modSSL key \$KEY\n";
+        $OUT .= "  /sbin/e-smith/db configuration setprop modSSL crt \$CERT\n";
+        $OUT .= "  /sbin/e-smith/db configuration setprop modSSL CertificateChainFile \$CHAIN\n";
+        $OUT .= "  /sbin/e-smith/signal-event domain-modify\n";
+        $OUT .= "  /sbin/e-smith/signal-event email-update\n";
+        $OUT .= "  /sbin/e-smith/signal-event ibay-modify\n";
+        $OUT .= "fi\n";
+    }
+}
