@@ -92,7 +92,7 @@ fi
 chmod -R 0775  /home/e-smith/files/ibays/Primary/html/.well-known
 chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 
-if [[ ! -e /usr/local/bin/hook-script.sh]]; then
+if [[ ! -f "/usr/local/bin/hook-script.sh" ]]; then
 touch /usr/local/bin/hook-script.sh
 chmod 0755 /usr/local/bin/hook-script.sh
 fi
