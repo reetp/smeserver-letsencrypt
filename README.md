@@ -28,10 +28,6 @@ db domains setprop mydomain.com letsencryptSSLcert enabled
 Per host (domain has to be enabled first)
 db hosts setprop www.mydomain.com letsencryptSSLcert enabled
 
-If you want a hook script to push changes
-edit /usr/local/bin/hook-script.sh
-db configuration setprop letsencrypt hookScript enabled
-
 Expanding templates
 expand-template expand-template /etc/letsencrypt.sh/domains.txt
 cat /etc/letsencrypt.sh/domains.txt
@@ -39,7 +35,19 @@ cat /etc/letsencrypt.sh/domains.txt
 expand-template /etc/letsencrypt.sh/config.sh
 cat /etc/letsencrypt.sh/config.sh
 
+If you want a hook script to push changes
+
+db configuration setprop letsencrypt hookScript enabled  
+db configuration setprop letsencrypt user someuser  
+db configuration setprop letsencrypt host 1.2.3.4
+db configuration setprop letsencrypt path //some/remote/local/path  
+
 Create or test create certificates (files is in the path so should be OK)
+
+If the hookScript is enabled then just do :
+letsencrypt.sh -c
+
+If hookScript is not enbaled you will need :
 
   /sbin/e-smith/signal-event domain-modify  
   /sbin/e-smith/signal-event email-update  
