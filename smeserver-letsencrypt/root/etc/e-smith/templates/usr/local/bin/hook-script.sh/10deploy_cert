@@ -7,7 +7,7 @@
 
     my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )     || 'disabled';
 
-    if ( $letsencryptStatus eq 'enabled' ) {
+    if ( $letsencryptStatus ne 'disabled' ) {
 
         $OUT .= "#!/bin/bash\n";
         $OUT .= "# deploy_cert hook will set config database entries to put to cert files\n";
