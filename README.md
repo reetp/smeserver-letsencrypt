@@ -51,7 +51,7 @@ signal-event console-save
 
 and
 
-mc /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test
+mv /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test
 
 letsencrypt.sh -c -x
 
