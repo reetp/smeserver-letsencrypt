@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 12
+%define release 13
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,6 +19,10 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
+* Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-13
+- Add missing templates.metadata file
+- modify spec file wording
+
 * Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-12
 - Set hookscript to always run unless letsencrypt is disabled
 - Add cron.daily script to console-save action and set perms
@@ -103,14 +107,16 @@ chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 echo "###################################################################"
 echo "# After install please set your db keys"
 echo "# Make sure you set the letsencrypt status key to test"
-echo "# Set the modSSL keys"
 echo "# Enable some domains and hosts"
 echo "# Then run the following"
 echo "# signal-event console-save"
 echo "# letsencrypt.sh -c"
 echo "# Once you are satisfied set the letsencrypt status key to enabled"
+echo "# mv /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test"
 echo "# Run the letesencypt.sh file again to generate your keys"
-echo "# Change your letsencrypt status key back to test"
+echo "# letsencrypt -c -x"
+echo "# Thereafter ony use"
+echo "# letsencrypt -c"
 echo "###################################################################"
 
 %postun
