@@ -39,17 +39,23 @@ Then run
 
 signal-event console-save
 
-Create or test create certificates (file is in the path so should be OK)
+Create test certificates (file is in the path so should be OK)
 
 letsencrypt.sh -c
 
 Once you are satisfied with your test
 
-config setprop letsencrypt status test
+config setprop letsencrypt status enabled
 
 signal-event console-save
 
 and
+
+mc /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test
+
+letsencrypt.sh -c -x
+
+Note thereafter you ONLY need to run
 
 letsencrypt.sh -c
   
