@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 11
+%define release 12
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,6 +19,10 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
+* Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-12
+- Set hookscript to always run unless letsencrypt is disabled
+- Add cron.daily script to console-save action and set perms
+
 * Sun Jan 17 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-11
 - Fix hook-script.sh perms using templates.metadata
 
