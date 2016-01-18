@@ -6,7 +6,7 @@
     my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
 
     my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
-    
+
     $OUT .= "#!/bin/bash\n";
 
     $OUT .= "WELLKNOWN=/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\n";
@@ -25,8 +25,8 @@
         $OUT .= "CA=\"https://acme-v01.api.letsencrypt.org/directory\"\n";
     }
 
-    # Base directory for account key, generated certificates and list of domains (default: $SCRIPTDIR -- uses config directory if undefined)
-    #BASEDIR=$SCRIPTDIR
+# Base directory for account key, generated certificates and list of domains (default: $SCRIPTDIR -- uses config directory if undefined)
+#BASEDIR=$SCRIPTDIR
     $OUT .= "BASEDIR=\"/etc/letsencrypt.sh\"\n";
 
     # Location of private account key (default: $BASEDIR/private_key.pem)
@@ -46,8 +46,7 @@
         $OUT .= "CONTACT_EMAIL=$letsencryptEmail\n";
     }
 
-    my $letsencryptHook = $configDB->get_prop( 'letsencrypt', 'hookScript' ) || 'disabled';
-    if ( $letsencryptHook eq 'enabled' ) {
-        $OUT .= "HOOK=\"/usr/local/bin/hook-script.sh\"\n";
-    }
+    # Hook Script always enabled
+    $OUT .= "HOOK=\"/usr/local/bin/hook-script.sh\"\n";
+
 }

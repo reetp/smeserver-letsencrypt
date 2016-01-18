@@ -24,6 +24,7 @@ foreach (qw(
 {
     templates2events("$_", qw(
     bootstrap-console-save
+    console-save
     http-proxy-update
     ));
 }
