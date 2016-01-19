@@ -122,7 +122,7 @@ echo "# signal-event console-save"
 echo "# letsencrypt.sh -c -x"
 echo "# Thereafter only use"
 echo "# letsencrypt.sh -c"
-echo "# If you make any key changes run console-save first
+echo "# If you make any key changes run console-save first"
 echo "###################################################################"
 
 %postun
