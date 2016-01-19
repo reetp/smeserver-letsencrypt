@@ -20,12 +20,12 @@ Optional keys - (not required)
 config setprop letsencypt email (defaults to empty)  
 config setprop letsencypt keysize (defaults to 4096)  
 
-You need to enable a domain and a host on the domain
+You can enable just a domain or just a host on a domain
 
 Per domain 
 db domains setprop mydomain.com letsencryptSSLcert enabled
 
-Per host (domain has to be enabled first)
+Per host 
 db hosts setprop www.mydomain.com letsencryptSSLcert enabled
 
 If you want a hook script to push changes remotely (not required)
@@ -58,6 +58,8 @@ letsencrypt.sh -c -x
 Note thereafter you ONLY need to run
 
 letsencrypt.sh -c
-  
+
+If you make any db key changes run console-save to regenerate your config files
+
 ToDo
 
