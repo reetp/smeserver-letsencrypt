@@ -13,8 +13,8 @@ foreach (qw(
 {
     templates2events("$_", qw(
     post-upgrade
-    console-save
     bootstrap-console-save
+    console-save
     ));
 }
 
@@ -23,6 +23,7 @@ foreach (qw(
     ))
 {
     templates2events("$_", qw(
+    post-upgrade
     bootstrap-console-save
     console-save
     http-proxy-update
