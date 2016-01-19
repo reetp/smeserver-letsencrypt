@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 13
+%define release 14
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -19,6 +19,10 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
+* Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-14
+- Updated readme and install notes
+- Allow either domains or hosts
+
 * Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-13
 - Add missing templates.metadata file
 - modify spec file wording
@@ -107,16 +111,18 @@ chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 echo "###################################################################"
 echo "# After install please set your db keys"
 echo "# Make sure you set the letsencrypt status key to test"
-echo "# Enable some domains and hosts"
+echo "# Enable some domains or hosts"
 echo "# Then run the following"
 echo "# signal-event console-save"
 echo "# letsencrypt.sh -c"
 echo "# Once you are satisfied set the letsencrypt status key to enabled"
 echo "# mv /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test"
 echo "# Run the letesencypt.sh file again to generate your keys"
-echo "# letsencrypt -c -x"
-echo "# Thereafter ony use"
-echo "# letsencrypt -c"
+echo "# signal-event console-save"
+echo "# letsencrypt.sh -c -x"
+echo "# Thereafter only use"
+echo "# letsencrypt.sh -c"
+echo "# If you make any key changes run console-save first
 echo "###################################################################"
 
 %postun
