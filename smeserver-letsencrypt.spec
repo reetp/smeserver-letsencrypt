@@ -19,7 +19,7 @@ AutoReqProv: no
 Let’s Encrypt is a free, automated, and open certificate authority
 
 %changelog
-* Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-14
+* Tue Jan 19 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-14
 - Updated readme and install notes
 - Allow either domains or hosts
 
