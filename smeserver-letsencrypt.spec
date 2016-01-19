@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 14
+%define release 15
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -20,6 +20,10 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Tue Jan 19 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-15
+- Missed a "
+- remove ' from Let's encrypt and add URL
+
 * Tue Jan 19 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-14
 - Updated readme and install notes
 - Allow either domains or hosts
