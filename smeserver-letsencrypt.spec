@@ -16,7 +16,8 @@ Requires:  e-smith-release >= 8.0
 AutoReqProv: no
 
 %description
-Let’s Encrypt is a free, automated, and open certificate authority
+Lets Encrypt is a free, automated, and open certificate authority
+https://letsencrypt.org/
 
 %changelog
 * Tue Jan 19 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-14
