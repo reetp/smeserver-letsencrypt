@@ -12,5 +12,9 @@
         $OUT .= "#!/bin/sh\n\n";
         $OUT .= "/usr/local/bin/letsencrypt.sh -c 2>&1 > /dev/null";
     }
+
+    else {
+        $OUT .= "# letsencrypt is disabled\n";
+    }
 }
 

@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-%define release 12
+%define release 16
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -16,9 +16,25 @@ Requires:  e-smith-release >= 8.0
 AutoReqProv: no
 
 %description
-Let’s Encrypt is a free, automated, and open certificate authority
+Lets Encrypt is a free, automated, and open certificate authority
+https://letsencrypt.org/
 
 %changelog
+* Wed Jan 20 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-16
+- Minor fixes including typo in cron.daily
+
+* Tue Jan 19 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-15
+- Missed a "
+- remove ' from Let's encrypt and add URL
+
+* Tue Jan 19 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-14
+- Updated readme and install notes
+- Allow either domains or hosts
+
+* Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-13
+- Add missing templates.metadata file
+- modify spec file wording
+
 * Mon Jan 18 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-12
 - Set hookscript to always run unless letsencrypt is disabled
 - Add cron.daily script to console-save action and set perms
@@ -103,14 +119,18 @@ chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 echo "###################################################################"
 echo "# After install please set your db keys"
 echo "# Make sure you set the letsencrypt status key to test"
-echo "# Set the modSSL keys"
-echo "# Enable some domains and hosts"
+echo "# Enable some domains or hosts"
 echo "# Then run the following"
 echo "# signal-event console-save"
 echo "# letsencrypt.sh -c"
 echo "# Once you are satisfied set the letsencrypt status key to enabled"
+echo "# mv /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test"
 echo "# Run the letesencypt.sh file again to generate your keys"
-echo "# Change your letsencrypt status key back to test"
+echo "# signal-event console-save"
+echo "# letsencrypt.sh -c -x"
+echo "# Thereafter only use"
+echo "# letsencrypt.sh -c"
+echo "# If you make any key changes run console-save first"
 echo "###################################################################"
 
 %postun
