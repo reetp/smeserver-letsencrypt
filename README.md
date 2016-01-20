@@ -61,5 +61,20 @@ letsencrypt.sh -c
 
 If you make any db key changes run console-save to regenerate your config files
 
+You can now set any public ibays to SSL only using the server manager, or set the following key:
+
+db accounts setprop {accountname} SSL enabled
+
+You cannot set the Primary ibay to SSL from the panel:
+
+db accounts setprop Primary SSL enabled
+
+signal-event console-save 
+
+or
+
+signal-event ibay-modify Primary
+
+
 ToDo
 
