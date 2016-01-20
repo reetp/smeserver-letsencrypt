@@ -13,7 +13,7 @@
         $OUT .= "/usr/local/bin/letsencrypt.sh -c 2>&1 > /dev/null";
     }
 
-    esle {
+    else {
         $OUT .= "# letsencrypt is disabled\n";
     }
 }
