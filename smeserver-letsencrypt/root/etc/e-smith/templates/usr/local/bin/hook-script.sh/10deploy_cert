@@ -10,7 +10,7 @@
     if ( $letsencryptStatus ne 'disabled' ) {
 
         $OUT .= "#!/bin/bash\n";
-        $OUT .= "# deploy_cert hook will set config database entries to put to cert files\n";
+        $OUT .= "# deploy_cert hook will set config database entries for the cert files\n";
         $OUT .= "# and restart appropriate services\n";
         $OUT .= "#\n";
         $OUT .= "if [ \$1 = \"deploy_cert\" ]; then\n";
