@@ -21,7 +21,7 @@
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL key \$KEY\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL crt \$CERT\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL CertificateChainFile \$CHAIN\n";
-        $OUT .= "  echo \"Signal events\n";
+        $OUT .= "  echo \"Signal events\"\n";
         $OUT .= "  /sbin/e-smith/signal-event domain-modify\n";
         $OUT .= "  /sbin/e-smith/signal-event email-update\n";
         $OUT .= "  /sbin/e-smith/signal-event ibay-modify\n";
