@@ -17,7 +17,7 @@
         $OUT .= "  KEY=\$3\n";
         $OUT .= "  CERT=\$4\n";
         $OUT .= "  CHAIN=\${5/fullchain.pem/chain.pem}\n";
-        $OUT .= "  echo \"Set up modSSL db keys\n";
+        $OUT .= "  echo \"Set up modSSL db keys\"\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL key \$KEY\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL crt \$CERT\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL CertificateChainFile \$CHAIN\n";
