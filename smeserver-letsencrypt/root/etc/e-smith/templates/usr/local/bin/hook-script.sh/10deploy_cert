@@ -25,7 +25,7 @@
         $OUT .= "  /sbin/e-smith/signal-event domain-modify\n";
         $OUT .= "  /sbin/e-smith/signal-event email-update\n";
         $OUT .= "  /sbin/e-smith/signal-event ibay-modify\n";
-        $OUT .= "  echo \"All complete\n";
+        $OUT .= "  echo \"All complete\"\n";
         $OUT .= "fi\n";
     }
 }
