@@ -1,0 +1,20 @@
+{
+    use strict;
+    use warnings;
+    use esmith::ConfigDB;
+
+    my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
+
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
+
+    if ( $letsencryptStatus eq 'enabled' ) {
+
+        $OUT .= "#!/bin/sh\n\n";
+        $OUT .= "/usr/local/bin/letsencrypt.sh -c 2>&1 > /dev/null";
+    }
+
+    else {
+        $OUT .= "# letsencrypt is disabled\n";
+    }
+}
+

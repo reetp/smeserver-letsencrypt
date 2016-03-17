@@ -1,0 +1,31 @@
+#! /usr/bin/perl -w
+
+use esmith::Build::CreateLinks qw(:all);
+# my $event = "letsencrypt-update";
+
+# letsencrypt-update
+
+foreach (qw(
+       /etc/letsencrypt.sh/domains.txt
+       /etc/letsencrypt.sh/config.sh
+       /usr/local/bin/hook-script.sh
+    ))
+{
+    templates2events("$_", qw(
+    post-upgrade
+    bootstrap-console-save
+    console-save
+    ));
+}
+
+foreach (qw(
+       /etc/cron.daily/letsencrypt
+    ))
+{
+    templates2events("$_", qw(
+    post-upgrade
+    bootstrap-console-save
+    console-save
+    http-proxy-update
+    ));
+}
