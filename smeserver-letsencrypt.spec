@@ -25,7 +25,6 @@ https://letsencrypt.org/
 - https://github.com/lukas2511/letsencrypt.sh/commit/429c5250ede7ff4af3b6f37b39925cfa5afee278
 - Add "" to wellknown path in config.sh
 
-
 * Fri Feb 05 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-19
 - updated letsencrypt.sh
 - https://github.com/lukas2511/letsencrypt.sh/commit/21c18dd3b8c2572b894d9ec2e5c3fc2589f56f32
