@@ -12,7 +12,7 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: /var/tmp/%{name}-%{version}
 BuildArchitectures: noarch
 BuildRequires: e-smith-devtools
-Requires:  e-smith-release >= 8.0
+Requires: e-smith-release >= 8.0
 Requires: letsencrypt.sh
 AutoReqProv: no
 
