@@ -9,10 +9,6 @@
 
     if ( $letsencryptStatus ne 'disabled' ) {
 
-        $OUT .= "#!/bin/bash\n";
-        $OUT .= "# deploy_cert hook will set config database entries for the cert files\n";
-        $OUT .= "# and restart appropriate services\n";
-        $OUT .= "#\n";
         $OUT .= "if [ \$1 = \"deploy_cert\" ]; then\n";
         $OUT .= "  KEY=\$3\n";
         $OUT .= "  CERT=\$4\n";
@@ -22,9 +18,7 @@
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL crt \$CERT\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL CertificateChainFile \$CHAIN\n";
         $OUT .= "  echo \"Signal events\"\n";
-        $OUT .= "  /sbin/e-smith/signal-event domain-modify\n";
-        $OUT .= "  /sbin/e-smith/signal-event email-update\n";
-        $OUT .= "  /sbin/e-smith/signal-event ibay-modify\n";
+        $OUT .= "  /sbin/e-smith/signal-event ssl-update\n";
         $OUT .= "  echo \"All complete\"\n";
         $OUT .= "fi\n";
     }

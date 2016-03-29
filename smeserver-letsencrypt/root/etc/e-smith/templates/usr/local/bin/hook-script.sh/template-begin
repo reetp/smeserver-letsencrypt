@@ -1,0 +1,17 @@
+{
+    use strict;
+    use warnings;
+    use esmith::ConfigDB;
+
+    my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
+
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
+
+    if ( $letsencryptStatus ne 'disabled' ) {
+
+        $OUT .= "#!/bin/bash\n";
+        $OUT .= "# deploy_cert hook will set config database entries for the cert files\n";
+        $OUT .= "# and restart appropriate services\n";
+        $OUT .= "#\n";
+    }
+}
