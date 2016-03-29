@@ -22,7 +22,7 @@ https://letsencrypt.org/
 %changelog
 
 * Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-21
-- modify hook script templates as per Dan Browd contribution
+- modify hook script templates as per Dan Browns contribution
 
 * Thu Mar 17 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-20
 - updated letsencrypt.sh
