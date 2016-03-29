@@ -1,10 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.1
-<<<<<<< HEAD
-%define release 17
-=======
-%define release 20
->>>>>>> cd009772435e33e240a4e3aa23f0b189b5a40f52
+%define release 21
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -24,10 +20,10 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
-<<<<<<< HEAD
-* Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-17
+
+* Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-21
 - modify hook script templates as per Dan Browd contribution
-=======
+
 * Thu Mar 17 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-20
 - updated letsencrypt.sh
 - https://github.com/lukas2511/letsencrypt.sh/commit/429c5250ede7ff4af3b6f37b39925cfa5afee278
@@ -44,7 +40,6 @@ https://letsencrypt.org/
 * Sat Jan 23 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-17
 - Fix typos in hook-script
 - Add latest letsencrypt.sh script
->>>>>>> cd009772435e33e240a4e3aa23f0b189b5a40f52
 
 * Wed Jan 20 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-16
 - Minor fixes including typo in cron.daily
