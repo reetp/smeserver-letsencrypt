@@ -9,7 +9,7 @@
 
     $OUT .= "#!/bin/bash\n";
 
-    $OUT .= "WELLKNOWN=/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\n";
+    $OUT .= "WELLKNOWN=\"/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\"\n";
 
     if ( $letsencryptStatus eq 'test' ) {
 

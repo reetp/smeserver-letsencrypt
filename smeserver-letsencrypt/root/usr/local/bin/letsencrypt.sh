@@ -6,10 +6,18 @@
 set -e
 set -u
 set -o pipefail
+[[ -n "${ZSH_VERSION:-}" ]] && set -o SH_WORD_SPLIT && set +o FUNCTION_ARGZERO
 umask 077 # paranoid umask, we're creating private keys
 
-# Get the directory in which this script is stored
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Find directory in which this script is stored by traversing all symbolic links
+SOURCE="${0}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPTDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 BASEDIR="${SCRIPTDIR}"
 
 # Check for script dependencies
@@ -23,8 +31,8 @@ check_dependencies() {
   # curl returns with an error code in some ancient versions so we have to catch that
   set +e
   curl -V > /dev/null 2>&1
-  set -e
   retcode="$?"
+  set -e
   if [[ ! "${retcode}" = "0" ]] && [[ ! "${retcode}" = "2" ]]; then
     _exiterr "This script requires curl."
   fi
@@ -47,23 +55,25 @@ load_config() {
   CA="https://acme-v01.api.letsencrypt.org/directory"
   LICENSE="https://letsencrypt.org/documents/LE-SA-v1.0.1-July-27-2015.pdf"
   CHALLENGETYPE="http-01"
+  CONFIG_D=
   HOOK=
+  HOOK_CHAIN="no"
   RENEW_DAYS="30"
-  PRIVATE_KEY="${BASEDIR}/private_key.pem"
+  PRIVATE_KEY=
   KEYSIZE="4096"
-  WELLKNOWN="${BASEDIR}/.acme-challenges"
+  WELLKNOWN=
   PRIVATE_KEY_RENEW="no"
   KEY_ALGO=rsa
-  OPENSSL_CNF="$(openssl version -d | cut -d'"' -f2)/openssl.cnf"
+  OPENSSL_CNF="$(openssl version -d | cut -d\" -f2)/openssl.cnf"
   CONTACT_EMAIL=
-  LOCKFILE="${BASEDIR}/lock"
+  LOCKFILE=
 
   if [[ -z "${CONFIG:-}" ]]; then
     echo "#" >&2
-    echo "# !! WARNING !! No config file found, using default config!" >&2
+    echo "# !! WARNING !! No main config file found, using default config!" >&2
     echo "#" >&2
   elif [[ -e "${CONFIG}" ]]; then
-    echo "# INFO: Using config file ${CONFIG}"
+    echo "# INFO: Using main config file ${CONFIG}"
     BASEDIR="$(dirname "${CONFIG}")"
     # shellcheck disable=SC1090
     . "${CONFIG}"
@@ -71,11 +81,33 @@ load_config() {
     _exiterr "Specified config file doesn't exist."
   fi
 
+  if [[ -n "${CONFIG_D}" ]]; then
+    if [[ ! -d "${CONFIG_D}" ]]; then
+      _exiterr "The path ${CONFIG_D} specified for CONFIG_D does not point to a directory." >&2
+    fi
+
+    for check_config_d in "${CONFIG_D}"/*.sh; do
+      if [[ ! -e "${check_config_d}" ]]; then
+        echo "# !! WARNING !! Extra configuration directory ${CONFIG_D} exists, but no configuration found in it." >&2
+        break
+      elif [[ -f "${check_config_d}" ]] && [[ -r "${check_config_d}" ]]; then
+        echo "# INFO: Using additional config file ${check_config_d}"
+        . "${check_config_d}"
+      else
+        _exiterr "Specified additional config ${check_config_d} is not readable or not a file at all." >&2
+      fi
+   done
+  fi
+
   # Remove slash from end of BASEDIR. Mostly for cleaner outputs, doesn't change functionality.
   BASEDIR="${BASEDIR%%/}"
 
   # Check BASEDIR and set default variables
   [[ -d "${BASEDIR}" ]] || _exiterr "BASEDIR does not exist: ${BASEDIR}"
+
+  [[ -z "${PRIVATE_KEY}" ]] && PRIVATE_KEY="${BASEDIR}/private_key.pem"
+  [[ -z "${WELLKNOWN}" ]] && WELLKNOWN="${BASEDIR}/.acme-challenges"
+  [[ -z "${LOCKFILE}" ]] && LOCKFILE="${BASEDIR}/lock"
 
   [[ -n "${PARAM_HOOK:-}" ]] && HOOK="${PARAM_HOOK}"
   [[ -n "${PARAM_CHALLENGETYPE:-}" ]] && CHALLENGETYPE="${PARAM_CHALLENGETYPE}"
@@ -131,7 +163,7 @@ init_system() {
   pubExponent64="$(openssl rsa -in "${PRIVATE_KEY}" -noout -text | grep publicExponent | grep -oE "0x[a-f0-9]+" | cut -d'x' -f2 | hex2bin | urlbase64)"
   pubMod64="$(openssl rsa -in "${PRIVATE_KEY}" -noout -modulus | cut -d'=' -f2 | hex2bin | urlbase64)"
 
-  thumbprint="$(printf '{"e":"%s","kty":"RSA","n":"%s"}' "${pubExponent64}" "${pubMod64}" | openssl sha -sha256 -binary | urlbase64)"
+  thumbprint="$(printf '{"e":"%s","kty":"RSA","n":"%s"}' "${pubExponent64}" "${pubMod64}" | openssl dgst -sha256 -binary | urlbase64)"
 
   # If we generated a new private key in the step above we have to register it with the acme-server
   if [[ "${register_new_key}" = "yes" ]]; then
@@ -189,12 +221,13 @@ _openssl() {
   out="$(openssl "${@}" 2>&1)"
   res=$?
   set -e
-  if [[ $res -ne 0 ]]; then
-    echo "  + ERROR: failed to run $* (Exitcode: $res)" >&2
+  if [[ ${res} -ne 0 ]]; then
+    echo "  + ERROR: failed to run $* (Exitcode: ${res})" >&2
     echo >&2
     echo "Details:" >&2
-    echo "$out" >&2
-    exit $res
+    echo "${out}" >&2
+    echo >&2
+    exit ${res}
   fi
 }
 
@@ -202,14 +235,24 @@ _openssl() {
 http_request() {
   tempcont="$(mktemp -t XXXXXX)"
 
+  set +e
   if [[ "${1}" = "head" ]]; then
     statuscode="$(curl -s -w "%{http_code}" -o "${tempcont}" "${2}" -I)"
+    curlret="${?}"
   elif [[ "${1}" = "get" ]]; then
     statuscode="$(curl -s -w "%{http_code}" -o "${tempcont}" "${2}")"
+    curlret="${?}"
   elif [[ "${1}" = "post" ]]; then
     statuscode="$(curl -s -w "%{http_code}" -o "${tempcont}" "${2}" -d "${3}")"
+    curlret="${?}"
   else
+    set -e
     _exiterr "Unknown request method: ${1}"
+  fi
+  set -e
+
+  if [[ ! "${curlret}" = "0" ]]; then
+    _exiterr "Problem connecting to server (curl returned with ${curlret})"
   fi
 
   if [[ ! "${statuscode:0:1}" = "2" ]]; then
@@ -220,12 +263,12 @@ http_request() {
     rm -f "${tempcont}"
 
     # Wait for hook script to clean the challenge if used
-    if [[ -n "${HOOK}" ]] && [[ -n "${challenge_token:+set}" ]]; then
-      ${HOOK} "clean_challenge" '' "${challenge_token}" "${keyauth}"
+    if [[ -n "${HOOK}" ]] && [[ "${HOOK_CHAIN}" != "yes" ]] && [[ -n "${challenge_token:+set}" ]]; then
+      "${HOOK}" "clean_challenge" '' "${challenge_token}" "${keyauth}"
     fi
 
     # remove temporary domains.txt file if used
-    [[ -n "${PARAM_DOMAIN:-}" ]] && rm "${DOMAINS_TXT}"
+    [[ -n "${PARAM_DOMAIN:-}" && -n "${DOMAINS_TXT:-}" ]] && rm "${DOMAINS_TXT}"
     exit 1
   fi
 
@@ -257,49 +300,64 @@ signed_request() {
   http_request post "${1}" "${data}"
 }
 
-# Create certificate for domain(s)
-sign_domain() {
-  domain="${1}"
-  altnames="${*}"
-  timestamp="$(date +%s)"
+# Extracts all subject names from a CSR
+# Outputs either the CN, or the SANs, one per line
+extract_altnames() {
+  csr="${1}" # the CSR itself (not a file)
 
-  echo " + Signing domains..."
+  if ! <<<"${csr}" openssl req -verify -noout 2>/dev/null; then
+    _exiterr "Certificate signing request isn't valid"
+  fi
+
+  reqtext="$( <<<"${csr}" openssl req -noout -text )"
+  if <<<"${reqtext}" grep -q '^[[:space:]]*X509v3 Subject Alternative Name:[[:space:]]*$'; then
+    # SANs used, extract these
+    altnames="$( <<<"${reqtext}" grep -A1 '^[[:space:]]*X509v3 Subject Alternative Name:[[:space:]]*$' | tail -n1 )"
+    # split to one per line:
+    altnames="$( <<<"${altnames}" _sed -e 's/^[[:space:]]*//; s/, /\'$'\n''/g' )"
+    # we can only get DNS: ones signed
+    if [ -n "$( <<<"${altnames}" grep -v '^DNS:' )" ]; then
+      _exiterr "Certificate signing request contains non-DNS Subject Alternative Names"
+    fi
+    # strip away the DNS: prefix
+    altnames="$( <<<"${altnames}" _sed -e 's/^DNS://' )"
+    echo "${altnames}"
+
+  else
+    # No SANs, extract CN
+    altnames="$( <<<"${reqtext}" grep '^[[:space:]]*Subject:' | _sed -e 's/.* CN=([^ /,]*).*/\1/' )"
+    echo "${altnames}"
+  fi
+}
+
+# Create certificate for domain(s) and outputs it FD 3
+sign_csr() {
+  csr="${1}" # the CSR itself (not a file)
+
+  if { true >&3; } 2>/dev/null; then
+    : # fd 3 looks OK
+  else
+    _exiterr "sign_csr: FD 3 not open"
+  fi
+
+  shift 1 || true
+  altnames="${*:-}"
+  if [ -z "${altnames}" ]; then
+    altnames="$( extract_altnames "${csr}" )"
+  fi
+
   if [[ -z "${CA_NEW_AUTHZ}" ]] || [[ -z "${CA_NEW_CERT}" ]]; then
     _exiterr "Certificate authority doesn't allow certificate signing"
   fi
 
-  # If there is no existing certificate directory => make it
-  if [[ ! -e "${BASEDIR}/certs/${domain}" ]]; then
-    echo " + Creating new directory ${BASEDIR}/certs/${domain} ..."
-    mkdir -p "${BASEDIR}/certs/${domain}"
+  local idx=0
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    local -A challenge_uris challenge_tokens keyauths deploy_args
+  else
+    local -a challenge_uris challenge_tokens keyauths deploy_args
   fi
 
-  privkey="privkey.pem"
-  # generate a new private key if we need or want one
-  if [[ ! -f "${BASEDIR}/certs/${domain}/privkey.pem" ]] || [[ "${PRIVATE_KEY_RENEW}" = "yes" ]]; then
-    echo " + Generating private key..."
-    privkey="privkey-${timestamp}.pem"
-    case "${KEY_ALGO}" in
-      rsa) _openssl genrsa -out "${BASEDIR}/certs/${domain}/privkey-${timestamp}.pem" "${KEYSIZE}";;
-      prime256v1|secp384r1) _openssl ecparam -genkey -name "${KEY_ALGO}" -out "${BASEDIR}/certs/${domain}/privkey-${timestamp}.pem";;
-    esac
-  fi
-
-  # Generate signing request config and the actual signing request
-  echo " + Generating signing request..."
-  SAN=""
-  for altname in ${altnames}; do
-    SAN+="DNS:${altname}, "
-  done
-  SAN="${SAN%%, }"
-  local tmp_openssl_cnf
-  tmp_openssl_cnf="$(mktemp -t XXXXXX)"
-  cat "${OPENSSL_CNF}" > "${tmp_openssl_cnf}"
-  printf "[SAN]\nsubjectAltName=%s" "${SAN}" >> "${tmp_openssl_cnf}"
-  openssl req -new -sha256 -key "${BASEDIR}/certs/${domain}/${privkey}" -out "${BASEDIR}/certs/${domain}/cert-${timestamp}.csr" -subj "/CN=${domain}/" -reqexts SAN -config "${tmp_openssl_cnf}"
-  rm -f "${tmp_openssl_cnf}"
-
-  # Request and respond to challenges
+  # Request challenges
   for altname in ${altnames}; do
     # Ask the acme-server for new challenge token and extract them from the resulting json block
     echo " + Requesting challenge for ${altname}..."
@@ -327,48 +385,132 @@ sign_domain() {
         ;;
       "dns-01")
         # Generate DNS entry content for dns-01 validation
-        keyauth_hook="$(printf '%s' "${keyauth}" | openssl sha -sha256 -binary | urlbase64)"
+        keyauth_hook="$(printf '%s' "${keyauth}" | openssl dgst -sha256 -binary | urlbase64)"
         ;;
     esac
 
+    challenge_uris[${idx}]="${challenge_uri}"
+    keyauths[${idx}]="${keyauth}"
+    challenge_tokens[${idx}]="${challenge_token}"
+    # Note: assumes args will never have spaces!
+    deploy_args[${idx}]="${altname} ${challenge_token} ${keyauth_hook}"
+    idx=$((idx+1))
+  done
+
+  # Wait for hook script to deploy the challenges if used
+  [[ -n "${HOOK}" ]] && [[ "${HOOK_CHAIN}" = "yes" ]] && "${HOOK}" "deploy_challenge" ${deploy_args[@]}
+
+  # Respond to challenges
+  idx=0
+  for altname in ${altnames}; do
+    challenge_token="${challenge_tokens[${idx}]}"
+    keyauth="${keyauths[${idx}]}"
+
     # Wait for hook script to deploy the challenge if used
-    [[ -n "${HOOK}" ]] && ${HOOK} "deploy_challenge" "${altname}" "${challenge_token}" "${keyauth_hook}"
+    [[ -n "${HOOK}" ]] && [[ "${HOOK_CHAIN}" != "yes" ]] && "${HOOK}" "deploy_challenge" ${deploy_args[${idx}]}
 
     # Ask the acme-server to verify our challenge and wait until it is no longer pending
     echo " + Responding to challenge for ${altname}..."
-    result="$(signed_request "${challenge_uri}" '{"resource": "challenge", "keyAuthorization": "'"${keyauth}"'"}')"
+    result="$(signed_request "${challenge_uris[${idx}]}" '{"resource": "challenge", "keyAuthorization": "'"${keyauth}"'"}')"
 
-    status="$(printf '%s\n' "${result}" | get_json_string_value status)"
+    reqstatus="$(printf '%s\n' "${result}" | get_json_string_value status)"
 
-    while [[ "${status}" = "pending" ]]; do
+    while [[ "${reqstatus}" = "pending" ]]; do
       sleep 1
-      status="$(http_request get "${challenge_uri}" | get_json_string_value status)"
+      result="$(http_request get "${challenge_uris[${idx}]}")"
+      reqstatus="$(printf '%s\n' "${result}" | get_json_string_value status)"
     done
 
     [[ "${CHALLENGETYPE}" = "http-01" ]] && rm -f "${WELLKNOWN}/${challenge_token}"
 
     # Wait for hook script to clean the challenge if used
-    if [[ -n "${HOOK}" ]] && [[ -n "${challenge_token}" ]]; then
-      ${HOOK} "clean_challenge" "${altname}" "${challenge_token}" "${keyauth_hook}"
+    if [[ -n "${HOOK}" ]] && [[ "${HOOK_CHAIN}" != "yes" ]] && [[ -n "${challenge_token}" ]]; then
+      "${HOOK}" "clean_challenge" ${deploy_args[${idx}]}
     fi
+    idx=$((idx+1))
 
-    if [[ "${status}" = "valid" ]]; then
+    if [[ "${reqstatus}" = "valid" ]]; then
       echo " + Challenge is valid!"
     else
-      _exiterr "Challenge is invalid! (returned: ${status})"
+      break
     fi
   done
 
+  # Wait for hook script to clean the challenges if used
+  [[ -n "${HOOK}" ]] && [[ "${HOOK_CHAIN}" = "yes" ]] && "${HOOK}" "clean_challenge" ${deploy_args[@]}
+
+  if [[ "${reqstatus}" != "valid" ]]; then
+    # Clean up any remaining challenge_tokens if we stopped early
+    if [[ "${CHALLENGETYPE}" = "http-01" ]]; then
+      while [ ${idx} -lt ${#challenge_tokens[@]} ]; do
+        rm -f "${WELLKNOWN}/${challenge_tokens[${idx}]}"
+        idx=$((idx+1))
+      done
+    fi
+
+    _exiterr "Challenge is invalid! (returned: ${reqstatus}) (result: ${result})"
+  fi
+
   # Finally request certificate from the acme-server and store it in cert-${timestamp}.pem and link from cert.pem
   echo " + Requesting certificate..."
-  csr64="$(openssl req -in "${BASEDIR}/certs/${domain}/cert-${timestamp}.csr" -outform DER | urlbase64)"
+  csr64="$( <<<"${csr}" openssl req -outform DER | urlbase64)"
   crt64="$(signed_request "${CA_NEW_CERT}" '{"resource": "new-cert", "csr": "'"${csr64}"'"}' | openssl base64 -e)"
-  crt_path="${BASEDIR}/certs/${domain}/cert-${timestamp}.pem"
-  printf -- '-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n' "${crt64}" > "${crt_path}"
+  crt="$( printf -- '-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n' "${crt64}" )"
 
   # Try to load the certificate to detect corruption
   echo " + Checking certificate..."
-  _openssl x509 -text < "${crt_path}"
+  _openssl x509 -text <<<"${crt}"
+
+  echo "${crt}" >&3
+
+  unset challenge_token
+  echo " + Done!"
+}
+
+# Create certificate for domain(s)
+sign_domain() {
+  domain="${1}"
+  altnames="${*}"
+  timestamp="$(date +%s)"
+
+  echo " + Signing domains..."
+  if [[ -z "${CA_NEW_AUTHZ}" ]] || [[ -z "${CA_NEW_CERT}" ]]; then
+    _exiterr "Certificate authority doesn't allow certificate signing"
+  fi
+
+  # If there is no existing certificate directory => make it
+  if [[ ! -e "${BASEDIR}/certs/${domain}" ]]; then
+    echo " + Creating new directory ${BASEDIR}/certs/${domain} ..."
+    mkdir -p "${BASEDIR}/certs/${domain}"
+  fi
+
+  privkey="privkey.pem"
+  # generate a new private key if we need or want one
+  if [[ ! -r "${BASEDIR}/certs/${domain}/privkey.pem" ]] || [[ "${PRIVATE_KEY_RENEW}" = "yes" ]]; then
+    echo " + Generating private key..."
+    privkey="privkey-${timestamp}.pem"
+    case "${KEY_ALGO}" in
+      rsa) _openssl genrsa -out "${BASEDIR}/certs/${domain}/privkey-${timestamp}.pem" "${KEYSIZE}";;
+      prime256v1|secp384r1) _openssl ecparam -genkey -name "${KEY_ALGO}" -out "${BASEDIR}/certs/${domain}/privkey-${timestamp}.pem";;
+    esac
+  fi
+
+  # Generate signing request config and the actual signing request
+  echo " + Generating signing request..."
+  SAN=""
+  for altname in ${altnames}; do
+    SAN+="DNS:${altname}, "
+  done
+  SAN="${SAN%%, }"
+  local tmp_openssl_cnf
+  tmp_openssl_cnf="$(mktemp -t XXXXXX)"
+  cat "${OPENSSL_CNF}" > "${tmp_openssl_cnf}"
+  printf "[SAN]\nsubjectAltName=%s" "${SAN}" >> "${tmp_openssl_cnf}"
+  openssl req -new -sha256 -key "${BASEDIR}/certs/${domain}/${privkey}" -out "${BASEDIR}/certs/${domain}/cert-${timestamp}.csr" -subj "/CN=${domain}/" -reqexts SAN -config "${tmp_openssl_cnf}"
+  rm -f "${tmp_openssl_cnf}"
+
+  crt_path="${BASEDIR}/certs/${domain}/cert-${timestamp}.pem"
+  sign_csr "$(< "${BASEDIR}/certs/${domain}/cert-${timestamp}.csr" )" ${altnames} 3>"${crt_path}"
 
   # Create fullchain.pem
   echo " + Creating fullchain.pem..."
@@ -388,7 +530,7 @@ sign_domain() {
   ln -sf "cert-${timestamp}.pem" "${BASEDIR}/certs/${domain}/cert.pem"
 
   # Wait for hook script to clean the challenge and to deploy cert if used
-  [[ -n "${HOOK}" ]] && ${HOOK} "deploy_cert" "${domain}" "${BASEDIR}/certs/${domain}/privkey.pem" "${BASEDIR}/certs/${domain}/cert.pem" "${BASEDIR}/certs/${domain}/fullchain.pem"
+  [[ -n "${HOOK}" ]] && "${HOOK}" "deploy_cert" "${domain}" "${BASEDIR}/certs/${domain}/privkey.pem" "${BASEDIR}/certs/${domain}/cert.pem" "${BASEDIR}/certs/${domain}/fullchain.pem" "${BASEDIR}/certs/${domain}/chain.pem"
 
   unset challenge_token
   echo " + Done!"
@@ -409,7 +551,10 @@ command_sign_domains() {
   fi
 
   # Generate certificates for all domains found in domains.txt. Check if existing certificate are about to expire
-  <"${DOMAINS_TXT}" _sed -e 's/^[[:space:]]*//g' -e 's/[[:space:]]*$//g' -e 's/[[:space:]]+/ /g' | (grep -vE '^(#|$)' || true) | while read -r line; do
+  ORIGIFS="${IFS}"
+  IFS=$'\n'
+  for line in $(cat "${DOMAINS_TXT}" | tr -d '\r' | _sed -e 's/^[[:space:]]*//g' -e 's/[[:space:]]*$//g' -e 's/[[:space:]]+/ /g' | (grep -vE '^(#|$)' || true)); do
+    IFS="${ORIGIFS}"
     domain="$(printf '%s\n' "${line}" | cut -d' ' -f1)"
     morenames="$(printf '%s\n' "${line}" | cut -s -d' ' -f2-)"
     cert="${BASEDIR}/certs/${domain}/cert.pem"
@@ -468,6 +613,25 @@ command_sign_domains() {
   exit 0
 }
 
+# Usage: --signcsr (-s) path/to/csr.pem
+# Description: Sign a given CSR, output CRT on stdout (advanced usage)
+command_sign_csr() {
+  # redirect stdout to stderr
+  # leave stdout over at fd 3 to output the cert
+  exec 3>&1 1>&2
+
+  init_system
+
+  csrfile="${1}"
+  if [ ! -r "${csrfile}" ]; then
+    _exiterr "Could not read certificate signing request ${csrfile}"
+  fi
+
+  sign_csr "$(< "${csrfile}" )"
+
+  exit 0
+}
+
 # Usage: --revoke (-r) path/to/cert.pem
 # Description: Revoke specified certificate
 command_revoke() {
@@ -499,6 +663,60 @@ command_revoke() {
   mv -f "${cert}" "${cert}-revoked"
 }
 
+# Usage: --cleanup (-gc)
+# Description: Move unused certificate files to archive directory
+command_cleanup() {
+  load_config
+
+  # Create global archive directory if not existant
+  if [[ ! -e "${BASEDIR}/archive" ]]; then
+    mkdir "${BASEDIR}/archive"
+  fi
+
+  # Loop over all certificate directories
+  for certdir in "${BASEDIR}/certs/"*; do
+    # Skip if entry is not a folder
+    [[ -d "${certdir}" ]] || continue
+
+    # Get certificate name
+    certname="$(basename "${certdir}")"
+
+    # Create certitifaces archive directory if not existant
+    archivedir="${BASEDIR}/archive/${certname}"
+    if [[ ! -e "${archivedir}" ]]; then
+      mkdir "${archivedir}"
+    fi
+
+    # Loop over file-types (certificates, keys, signing-requests, ...)
+    for filetype in cert.csr cert.pem chain.pem fullchain.pem privkey.pem; do
+      # Skip if symlink is broken
+      [[ -r "${certdir}/${filetype}" ]] || continue
+
+      # Look up current file in use
+      current="$(basename $(readlink "${certdir}/${filetype}"))"
+
+      # Split filetype into name and extension
+      filebase="$(echo "${filetype}" | cut -d. -f1)"
+      fileext="$(echo "${filetype}" | cut -d. -f2)"
+
+      # Loop over all files of this type
+      for file in "${certdir}/${filebase}-"*".${fileext}"; do
+        # Handle case where no files match the wildcard
+        [[ -f "${file}" ]] || break
+
+        # Check if current file is in use, if unused move to archive directory
+        filename="$(basename "${file}")"
+        if [[ ! "${filename}" = "${current}" ]]; then
+          echo "Moving unused file to archive directory: ${certname}/$filename"
+          mv "${certdir}/${filename}" "${archivedir}/${filename}"
+        fi
+      done
+    done
+  done
+
+  exit 0
+}
+
 # Usage: --help (-h)
 # Description: Show help text
 command_help() {
@@ -525,7 +743,7 @@ command_help() {
 command_env() {
   echo "# letsencrypt.sh configuration"
   load_config
-  typeset -p CA LICENSE CHALLENGETYPE HOOK RENEW_DAYS PRIVATE_KEY KEYSIZE WELLKNOWN PRIVATE_KEY_RENEW OPENSSL_CNF CONTACT_EMAIL LOCKFILE
+  typeset -p CA LICENSE CHALLENGETYPE HOOK HOOK_CHAIN RENEW_DAYS PRIVATE_KEY KEYSIZE WELLKNOWN PRIVATE_KEY_RENEW OPENSSL_CNF CONTACT_EMAIL LOCKFILE
 }
 
 # Main method (parses script arguments and calls command_* methods)
@@ -549,7 +767,7 @@ main() {
 
   [[ -z "${@}" ]] && eval set -- "--help"
 
-  while (( "${#}" )); do
+  while (( ${#} )); do
     case "${1}" in
       --help|-h)
         command_help
@@ -564,11 +782,22 @@ main() {
         set_command sign_domains
         ;;
 
+      --signcsr|-s)
+        shift 1
+        set_command sign_csr
+        check_parameters "${1:-}"
+        PARAM_CSR="${1}"
+        ;;
+
       --revoke|-r)
         shift 1
         set_command revoke
         check_parameters "${1:-}"
         PARAM_REVOKECERT="${1}"
+        ;;
+
+      --cleanup|-gc)
+        set_command cleanup
         ;;
 
       # PARAM_Usage: --domain (-d) domain.tld
@@ -644,7 +873,9 @@ main() {
   case "${COMMAND}" in
     env) command_env;;
     sign_domains) command_sign_domains;;
+    sign_csr) command_sign_csr "${PARAM_CSR}";;
     revoke) command_revoke "${PARAM_REVOKECERT}";;
+    cleanup) command_cleanup;;
     *) command_help; exit 1;;
   esac
 }

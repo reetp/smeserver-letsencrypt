@@ -18,7 +18,13 @@
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL crt \$CERT\n";
         $OUT .= "  /sbin/e-smith/db configuration setprop modSSL CertificateChainFile \$CHAIN\n";
         $OUT .= "  echo \"Signal events\"\n";
+<<<<<<< HEAD
         $OUT .= "  /sbin/e-smith/signal-event ssl-update\n";
+=======
+        $OUT .= "  /sbin/e-smith/signal-event domain-modify\n";
+        $OUT .= "  /sbin/e-smith/signal-event email-update\n";
+        $OUT .= "  /sbin/e-smith/signal-event ibay-modify\n";
+>>>>>>> cd009772435e33e240a4e3aa23f0b189b5a40f52
         $OUT .= "  echo \"All complete\"\n";
         $OUT .= "fi\n";
     }
