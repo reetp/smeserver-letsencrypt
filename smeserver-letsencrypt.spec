@@ -20,7 +20,7 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
-* Tue mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-17
+* Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-17
 - modify hook script templates as per Dan Browd contribution
 
 * Wed Jan 20 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-16
