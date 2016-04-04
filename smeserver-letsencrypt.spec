@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.2
-%define release 1
+%define release 2
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -21,6 +21,10 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Mon Apr 04 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-2
+- letsencrypt.sh now calls deploy-cert with an argument for the chain file
+- thanks to Dan Brown
+
 * Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-1
 - Remove letsencrypt.sh script and put in separate RPM
 
