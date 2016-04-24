@@ -27,7 +27,8 @@
         # print "@domains\n";
 
 # Need to check here if we want ALL set
-
+# all, domains, hosts, both, none
+    my $letsencryptConfig = $configDB->get_prop( 'letsencrypt', 'configure' ) || 'all';
 
         # First get all the domains
 
