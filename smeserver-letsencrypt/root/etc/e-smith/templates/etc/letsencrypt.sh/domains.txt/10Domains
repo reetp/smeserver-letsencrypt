@@ -1,3 +1,4 @@
+#!/bin/perl
 {
     use strict;
     use warnings;
@@ -24,6 +25,9 @@
         my @domains = $domainsDB->keys;
 
         # print "@domains\n";
+
+# Need to check here if we want ALL set
+
 
         # First get all the domains
 
