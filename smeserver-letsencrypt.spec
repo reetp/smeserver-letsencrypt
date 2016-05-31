@@ -148,15 +148,15 @@ then mkdir /etc/letsencrypt.sh;
 fi
 
 if [[! -e /etc/letsencrypt.sh/config.sh]];
-then mv -f /etc/letsencrypt.sh/config.sh /usr/local/bin/config.sh.old;
+then mv -f /etc/letsencrypt.sh/config.sh /etc/letsencrypt.sh/config.sh.old;
 fi
 
 if [[! -e /etc/letsencrypt.sh/config]];
-then mv -f /etc/letsencrypt.sh/config /usr/local/bin/config.old;
+then mv -f /etc/letsencrypt.sh/config /etc/letsencrypt.sh/config.old;
 fi
 
 if [[! -e /usr/local/bin/config.sh]];
-then mv -f /usr/local/bin/config.sh /usr/local/bin/config.sh.old;
+then mv -f /usr/local/bin/config.sh /usr/local/bin/config.sh.orig;
 fi
 
 if [[! -e /usr/local/bin/config]];
