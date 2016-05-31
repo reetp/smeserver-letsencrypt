@@ -21,6 +21,11 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Mon May 30 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-3
+- add support for letsencrypt.sh v0.2
+- config.sh renamed to config
+- fix trailing / on urls in 40ACME
+
 * Mon Apr 04 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-2
 - letsencrypt.sh now calls deploy-cert with an argument for the chain file
 - thanks to Dan Brown
@@ -137,7 +142,11 @@ then mkdir /etc/letsencrypt.sh;
 fi
 
 if [[! -e /usr/local/bin/config.sh]];
-then mv -f /usr/local/bin/config.sh /usr/local/bin/config.sh.orig;
+then mv -f /usr/local/bin/config.sh /usr/local/bin/config.sh.old;
+fi
+
+if [[! -e /usr/local/bin/config]];
+then mv -f /usr/local/bin/config /usr/local/bin/config.old;
 fi
 
 if [[! -e /usr/local/bin/domain.txt]];
