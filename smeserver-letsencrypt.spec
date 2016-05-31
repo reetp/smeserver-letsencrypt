@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.2
-%define release 2
+%define release 4
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -13,7 +13,7 @@ BuildRoot: /var/tmp/%{name}-%{version}
 BuildArchitectures: noarch
 BuildRequires: e-smith-devtools
 Requires: e-smith-release >= 8.0
-Requires: letsencrypt.sh
+Requires: letsencrypt.sh >= 0.0.9
 AutoReqProv: no
 
 %description
@@ -21,6 +21,9 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Mon May 30 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-4
+- update letsencrypt requires
+
 * Mon May 30 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-3
 - add support for letsencrypt.sh v0.2
 - config.sh renamed to config
@@ -139,6 +142,14 @@ rm -rf %{name}-%{version}
 %post
 if [[ ! -e /etc/letsencrypt.sh ]];
 then mkdir /etc/letsencrypt.sh;
+fi
+
+if [[! -e /etc/letsencrypt.sh.config.sh]];
+then mv -f /etc/letsencrypt.sh/config.sh /usr/local/bin/config.sh.old;
+fi
+
+if [[! -e /etc/letsencrypt.sh.config]];
+then mv -f /etc/letsencrypt.sh/config /usr/local/bin/config.old;
 fi
 
 if [[! -e /usr/local/bin/config.sh]];
