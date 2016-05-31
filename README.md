@@ -75,6 +75,10 @@ or
 
 signal-event ibay-modify Primary
 
+You can now use 'all' to set all domains or hosts regardless of status
+
+config setprop letsencrypt letsencyptConfig all | domains | hosts
+
 
 ToDo
 
