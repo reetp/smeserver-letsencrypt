@@ -1,2 +1,2 @@
     # Alias for letsencrypt
-    Alias /.well-known/acme-challenge /home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge
+    Alias /.well-known/acme-challenge/ /home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge/
