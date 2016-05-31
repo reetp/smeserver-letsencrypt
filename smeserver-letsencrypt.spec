@@ -21,7 +21,7 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
-* Mon May 30 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-4
+* Tue May 31 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-4
 - update letsencrypt requires
 
 * Mon May 30 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-3
