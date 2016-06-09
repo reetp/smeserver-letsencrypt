@@ -23,6 +23,7 @@ https://letsencrypt.org/
 %changelog
 * Fri Jun 10 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-6
 - Fix typo in domains.txt
+- Set configure default type none
 
 * Tue May 31 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-5
 - update incorrect bash scripts in spec file

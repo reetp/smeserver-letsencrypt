@@ -75,7 +75,7 @@
             foreach my $fqdn (@hosts) {
 
                 # If we are set to all or hosts just do it
-                if ( $letsencryptConfig eq 'all' || $letsenctyptConfig eq 'hosts' ) {
+                if ( $letsencryptConfig eq 'all' || $letsencryptConfig eq 'hosts' ) {
                     $OUT .= "$fqdn ";
                 }
 
