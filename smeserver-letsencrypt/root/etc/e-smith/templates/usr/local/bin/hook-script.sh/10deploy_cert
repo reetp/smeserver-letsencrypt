@@ -5,21 +5,24 @@
 
     my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
 
-    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )     || 'disabled';
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
 
     if ( $letsencryptStatus ne 'disabled' ) {
 
-        $OUT .= "if [ \$1 = \"deploy_cert\" ]; then\n";
-        $OUT .= "  KEY=\$3\n";
-        $OUT .= "  CERT=\$4\n";
-        $OUT .= "  CHAIN=\${5/fullchain.pem/chain.pem}\n";
-        $OUT .= "  echo \"Set up modSSL db keys\"\n";
-        $OUT .= "  /sbin/e-smith/db configuration setprop modSSL key \$KEY\n";
-        $OUT .= "  /sbin/e-smith/db configuration setprop modSSL crt \$CERT\n";
-        $OUT .= "  /sbin/e-smith/db configuration setprop modSSL CertificateChainFile \$CHAIN\n";
-        $OUT .= "  echo \"Signal events\"\n";
-        $OUT .= "  /sbin/e-smith/signal-event ssl-update\n";
-        $OUT .= "  echo \"All complete\"\n";
-        $OUT .= "fi\n";
+    $OUT .= <<'_EOF';
+    
+    if [ $1 = "deploy_cert" ]; then
+      KEY=$3
+      CERT=$4
+      CHAIN=$6
+      echo "Set up modSSL db keys"
+      /sbin/e-smith/db configuration setprop modSSL key $KEY
+      /sbin/e-smith/db configuration setprop modSSL crt $CERT
+      /sbin/e-smith/db configuration setprop modSSL CertificateChainFile $CHAIN
+      echo "Signal events"
+      /sbin/e-smith/signal-event ssl-update
+      echo "All complete"
+    fi
+_EOF
     }
 }

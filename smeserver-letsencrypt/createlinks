@@ -7,7 +7,7 @@ use esmith::Build::CreateLinks qw(:all);
 
 foreach (qw(
        /etc/letsencrypt.sh/domains.txt
-       /etc/letsencrypt.sh/config.sh
+       /etc/letsencrypt.sh/config
        /usr/local/bin/hook-script.sh
     ))
 {

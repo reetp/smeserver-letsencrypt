@@ -5,11 +5,13 @@
 
     my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
 
-    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )
+      || 'disabled';
 
     $OUT .= "#!/bin/bash\n";
 
-    $OUT .= "WELLKNOWN=\"/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\"\n";
+    $OUT .=
+"WELLKNOWN=\"/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\"\n";
 
     if ( $letsencryptStatus eq 'test' ) {
 
@@ -20,8 +22,8 @@
 
     elsif ( $letsencryptStatus ne 'test' ) {
 
-        # Real server - default setting in the the main file
-        # Only use this once you are sure things are OK or you will hit a rate limit.
+   # Real server - default setting in the the main file
+   # Only use this once you are sure things are OK or you will hit a rate limit.
         $OUT .= "CA=\"https://acme-v01.api.letsencrypt.org/directory\"\n";
     }
 
@@ -32,7 +34,8 @@
     # Location of private account key (default: $BASEDIR/private_key.pem)
     #PRIVATE_KEY="${BASEDIR}/private_key.pem"
 
-    my $letsencryptKeysize = $configDB->get_prop( 'letsencrypt', 'keysize' ) || '';
+    my $letsencryptKeysize = $configDB->get_prop( 'letsencrypt', 'keysize' )
+      || '';
     if ( $letsencryptKeysize ne '' ) {
 
         # Default keysize for private keys (default: 4096)

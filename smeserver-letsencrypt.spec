@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
-%define version 0.1
-%define release 21
+%define version 0.2
+%define release 7
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -12,7 +12,8 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: /var/tmp/%{name}-%{version}
 BuildArchitectures: noarch
 BuildRequires: e-smith-devtools
-Requires:  e-smith-release >= 8.0
+Requires: e-smith-release >= 8.0
+Requires: letsencrypt.sh >= 0.0.9
 AutoReqProv: no
 
 %description
@@ -20,6 +21,30 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Mon Jun 27 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-7
+- fix another typo in bash scripts
+
+* Fri Jun 10 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-6
+- Fix typo in domains.txt
+- Set configure default type none
+
+* Tue May 31 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-5
+- update incorrect bash scripts in spec file
+
+* Tue May 31 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-4
+- update letsencrypt requires
+
+* Mon May 30 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-3
+- add support for letsencrypt.sh v0.2
+- config.sh renamed to config
+- fix trailing / on urls in 40ACME
+
+* Mon Apr 04 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-2
+- letsencrypt.sh now calls deploy-cert with an argument for the chain file
+- thanks to Dan Brown
+
+* Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-1
+- Remove letsencrypt.sh script and put in separate RPM
 
 * Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-21
 - modify hook script templates as per Dan Browns contribution
@@ -127,6 +152,26 @@ rm -rf %{name}-%{version}
 %post
 if [[ ! -e /etc/letsencrypt.sh ]];
 then mkdir /etc/letsencrypt.sh;
+fi
+
+if [[ -f /etc/letsencrypt.sh/config.sh]];
+then mv -f /etc/letsencrypt.sh/config.sh /etc/letsencrypt.sh/config.sh.old;
+fi
+
+if [[ -f /etc/letsencrypt.sh/config]];
+then mv -f /etc/letsencrypt.sh/config /etc/letsencrypt.sh/config.old;
+fi
+
+if [[ -f /usr/local/bin/config.sh]];
+then mv -f /usr/local/bin/config.sh /usr/local/bin/config.sh.orig;
+fi
+
+if [[ -f /usr/local/bin/config]];
+then mv -f /usr/local/bin/config /usr/local/bin/config.old;
+fi
+
+if [[ -f /usr/local/bin/domain.txt]];
+then mv -f /usr/local/bin/domains.txt /usr/local/bin/domains.txt.orig;
 fi
 
 if [[ ! -e /home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge ]];

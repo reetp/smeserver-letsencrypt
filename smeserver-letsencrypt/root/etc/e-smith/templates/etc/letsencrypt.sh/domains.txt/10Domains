@@ -3,9 +3,11 @@
     use warnings;
     use esmith::ConfigDB;
 
-    my $configDB  = esmith::ConfigDB->open_ro            or die("can't open Config DB");
-    my $domainsDB = esmith::ConfigDB->open_ro('domains') or die("can't connect to domains database");
-    my $hostsDB   = esmith::ConfigDB->open_ro('hosts')   or die("can't connect to hosts database");
+    my $configDB = esmith::ConfigDB->open_ro or die("can't open Config DB");
+    my $domainsDB = esmith::ConfigDB->open_ro('domains')
+      or die("can't connect to domains database");
+    my $hostsDB = esmith::ConfigDB->open_ro('hosts')
+      or die("can't connect to hosts database");
 
     # my $dbKey     = 'domain';
 
@@ -15,59 +17,99 @@
     #        $OUT .= "# System not in Server Gateway mode\n";
     #    }
 
-    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
+    my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )
+      || 'disabled';
 
     if ( $letsencryptStatus ne 'disabled' ) {
 
         # This should get all the connections in an array
 
         my @domains = $domainsDB->keys;
+        my @hosts   = $hostsDB->keys;
 
         # print "@domains\n";
 
+        # Need to check here if we want ALL set
+        # all, domains, hosts, both, none
+        my $letsencryptConfig =
+          $configDB->get_prop( 'letsencrypt', 'configure' ) || 'none';
+
         # First get all the domains
+        # We could do this BUT only once as the array drops $vars
+
+        # my $dom = shift @domains;
 
         foreach my $domain (@domains) {
 
-            my $domainEnabled = $domainsDB->get_prop( "$domain", 'letsencryptSSLcert' ) || 'disabled';
+        # If we are all or domains then lets do all regardless
+            if ( $letsencryptConfig eq 'all' || $letsencryptConfig eq 'domains' )
+            {
 
-            if ( $domainEnabled eq 'enabled' ) {
-
-                #code
-
+                # Check for self
+                #my $domainStatus =
+                #  $domainsDB->get_prop( "Nameservers", 'HostType' ) || '';
+                #
+                #if ( $domainStatus eq 'Localhost' ) {
                 $OUT .= "$domain ";
+
+                #}
+            }
+
+            else {
+                my $domainEnabled =
+                  $domainsDB->get_prop( "$domain", 'letsencryptSSLcert' )
+                  || 'disabled';
+
+                if ( $domainEnabled eq 'enabled' ) {
+
+                    $OUT .= "$domain ";
+                }
             }
 
             # Now check for hosts
 
-            my @hosts = $hostsDB->keys;
+            # Buggered if I remember why we check that
+            # the host has a domain name in domains !
+            # Must have been a reason
 
             foreach my $fqdn (@hosts) {
 
-                # Lets get the hostname
-                my $hostname = $fqdn;
-                $hostname =~ s/\..*//;
+                # If we are set to all or hosts just do it
+                if ( $letsencryptConfig eq 'all' || $letsencryptConfig eq 'hosts' ) {
+                    $OUT .= "$fqdn ";
+                }
 
-                # print "$hostname\n";
+                # Just do selected entries
+                else {
+                    # Lets get the hostname
+                    my $hostname = $fqdn;
+                    $hostname =~ s/\..*//;
 
-                # Lets get the domain name
-                my $domainname = $fqdn;
-                $domainname =~ s/.*?\.//;
+                    # print "$hostname\n";
 
-                # print "$domainname\n";
+                    # Lets get the domain name
+                    my $domainname = $fqdn;
+                    $domainname =~ s/.*?\.//;
 
-                # is the domain name from the hosts file the same as that in the domains file ?
-                my $hostEnabled = $hostsDB->get_prop( "$fqdn", 'letsencryptSSLcert' ) || 'disabled';
+                    # print "$domainname\n";
 
-                if ( $domainname eq $domain && $hostEnabled eq 'enabled' ) {
+                    # is the domain name from the hosts file
+                    # the same as that in the domains file ?
+                    my $hostEnabled =
+                      $hostsDB->get_prop( "$fqdn", 'letsencryptSSLcert' )
+                      || 'disabled';
 
-                    # Are we self ?
-                    my $type = $hostsDB->get_prop( "$fqdn", 'HostType' );
+                    if ( $domainname eq $domain && $hostEnabled eq 'enabled' ) {
 
-                    if ( $type eq 'Self' ) {
+                        # Are we self ?
+                        my $type = $hostsDB->get_prop( "$fqdn", 'HostType' );
 
-                        #   print "$fqdn  $type\n";
-                        $OUT .= "$fqdn ";
+                        if ( $type eq 'Self' ) {
+
+                            #   print "$fqdn  $type\n";
+                            $OUT .= "$fqdn ";
+
+                        }
 
                     }
                 }
