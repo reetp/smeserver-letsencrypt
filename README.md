@@ -77,7 +77,7 @@ signal-event ibay-modify Primary
 
 You can now use a db entry to set all domains or hosts regardless of status
 
-config setprop letsencrypt letsencryptConfig none| all | domains | hosts
+config setprop letsencrypt configure none| all | domains | hosts
 
 default is none
 
