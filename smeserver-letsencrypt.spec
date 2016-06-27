@@ -23,6 +23,7 @@ https://letsencrypt.org/
 %changelog
 * Mon Jun 27 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-7
 - fix another typo in bash scripts
+- fix typo in Docs
 
 * Fri Jun 10 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-6
 - Fix typo in domains.txt
