@@ -1,6 +1,6 @@
 %define name smeserver-letsencrypt
 %define version 0.2
-%define release 7
+%define release 8
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
@@ -21,6 +21,9 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Thu Jul 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-8
+- Remove spaces in POSTIN [[]]
+
 * Mon Jun 27 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-7
 - fix another typo in bash scripts
 - fix typo in Docs
@@ -155,23 +158,23 @@ if [[ ! -e /etc/letsencrypt.sh ]];
 then mkdir /etc/letsencrypt.sh;
 fi
 
-if [[ -f /etc/letsencrypt.sh/config.sh]];
+if [[ -f /etc/letsencrypt.sh/config.sh ]];
 then mv -f /etc/letsencrypt.sh/config.sh /etc/letsencrypt.sh/config.sh.old;
 fi
 
-if [[ -f /etc/letsencrypt.sh/config]];
+if [[ -f /etc/letsencrypt.sh/config ]];
 then mv -f /etc/letsencrypt.sh/config /etc/letsencrypt.sh/config.old;
 fi
 
-if [[ -f /usr/local/bin/config.sh]];
+if [[ -f /usr/local/bin/config.sh ]];
 then mv -f /usr/local/bin/config.sh /usr/local/bin/config.sh.orig;
 fi
 
-if [[ -f /usr/local/bin/config]];
+if [[ -f /usr/local/bin/config ]];
 then mv -f /usr/local/bin/config /usr/local/bin/config.old;
 fi
 
-if [[ -f /usr/local/bin/domain.txt]];
+if [[ -f /usr/local/bin/domain.txt ]];
 then mv -f /usr/local/bin/domains.txt /usr/local/bin/domains.txt.orig;
 fi
 
