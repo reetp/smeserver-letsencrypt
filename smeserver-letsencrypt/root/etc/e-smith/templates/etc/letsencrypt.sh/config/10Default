@@ -55,7 +55,7 @@
     }
 
     if ( $letsencryptLicence ne '' ) {
-        $OUT .= "LICENCE=$letsencryptLicence\n";
+        $OUT .= "LICENCE=\"$letsencryptLicence\"\n";
     }
         
     # Hook Script always enabled
