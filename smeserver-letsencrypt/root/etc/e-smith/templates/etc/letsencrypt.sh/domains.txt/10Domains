@@ -31,19 +31,24 @@
 
         # Need to check here if we want ALL set
         # all, domains, hosts, both, none
-        my $letsencryptConfig =
-          $configDB->get_prop( 'letsencrypt', 'configure' ) || 'none';
+        my $letsencryptConfig = $configDB->get_prop( 'letsencrypt', 'configure' ) || 'none';
 
         # First get all the domains
         # We could do this BUT only once as the array drops $vars
 
         # my $dom = shift @domains;
 
+        # Patch from JPP
+        # Put Primary domain at top
+        my $DomainName = $configDB->get('DomainName')->value;
+        my $mainDomainStatus = $domainsDB->get_prop( "$DomainName", 'letsencryptSSLcert' )
+          || 'disabled';
+        $OUT .= "$DomainName " unless $mainDomainStatus eq 'disabled';
+
         foreach my $domain (@domains) {
 
-        # If we are all or domains then lets do all regardless
-            if ( $letsencryptConfig eq 'all' || $letsencryptConfig eq 'domains' )
-            {
+            # If we are all or domains then lets do all regardless
+            if ( $letsencryptConfig eq 'all' || $letsencryptConfig eq 'domains' ) {
 
                 # Check for self
                 #my $domainStatus =
@@ -51,18 +56,15 @@
                 #
                 #if ( $domainStatus eq 'Localhost' ) {
                 $OUT .= "$domain ";
-
                 #}
             }
 
             else {
-                my $domainEnabled =
-                  $domainsDB->get_prop( "$domain", 'letsencryptSSLcert' )
+                my $domainEnabled = $domainsDB->get_prop( "$domain", 'letsencryptSSLcert' )
                   || 'disabled';
 
                 if ( $domainEnabled eq 'enabled' ) {
-
-                    $OUT .= "$domain ";
+                    $OUT .= "$domain " unless $DomainName eq $domain;
                 }
             }
 
@@ -76,7 +78,7 @@
 
                 # If we are set to all or hosts just do it
                 if ( $letsencryptConfig eq 'all' || $letsencryptConfig eq 'hosts' ) {
-                    $OUT .= "$fqdn ";
+                    $OUT .= "$fqdn " unless $DomainName eq $fqdn;
                 }
 
                 # Just do selected entries
@@ -95,8 +97,7 @@
 
                     # is the domain name from the hosts file
                     # the same as that in the domains file ?
-                    my $hostEnabled =
-                      $hostsDB->get_prop( "$fqdn", 'letsencryptSSLcert' )
+                    my $hostEnabled = $hostsDB->get_prop( "$fqdn", 'letsencryptSSLcert' )
                       || 'disabled';
 
                     if ( $domainname eq $domain && $hostEnabled eq 'enabled' ) {
@@ -107,8 +108,7 @@
                         if ( $type eq 'Self' ) {
 
                             #   print "$fqdn  $type\n";
-                            $OUT .= "$fqdn ";
-
+                            $OUT .= "$fqdn " unless $DomainName eq $fqdn;
                         }
 
                     }
