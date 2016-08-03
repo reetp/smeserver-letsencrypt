@@ -20,7 +20,7 @@ Optional keys - (not required)
 config setprop letsencypt email (defaults to empty)  
 config setprop letsencypt keysize (defaults to 4096)
 
-If the licence changes before this script is updated you can specify a knew licence URL:
+If the licence changes before this script is updated you can specify a new licence URL:
 config setprop letsencrypt licence https://letsencrypt.org/documents/LE-SA-v1.0.1-July-27-2015.pdf
 
 You can enable just a domain or just a host on a domain
