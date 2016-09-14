@@ -98,6 +98,31 @@ If you set to domains it will enable ALL domains regardless of individual settin
 If you set to hosts it will enable ALL hosts regardless of individual settings. Domains will be per domain as normal
 If you set to all it will enable ALL hosts AND domains regardless of individual settings.
 
+Errors
+
+If you see:
+
+ ERROR: Problem connecting to server (get for https://acme-v01.api.letsencrypt.org/directory; curl returned with 6)
+
+Try this:
+
+ curl https://acme-v01.api.letsencrypt.org/directory
+
+It should show something like this:
+
+ [root@test ~]# curl https://acme-v01.api.letsencrypt.org/directory
+ {
+   "new-authz": "https://acme-v01.api.letsencrypt.org/acme/new-authz",
+   "new-cert": "https://acme-v01.api.letsencrypt.org/acme/new-cert",
+   "new-reg": "https://acme-v01.api.letsencrypt.org/acme/new-reg",
+   "revoke-cert": "https://acme-v01.api.letsencrypt.org/acme/revoke-cert"
+ }
+
+
+ warning:    erase unlink of /usr/local/bin/config.sh failed: No such file or directory
+ 
+This is due to the original config.sh file being renamed/moved and the rpm cannot find it during package update/replacement
+It is log noise and can safely be ignored.
 
 ToDo
 
