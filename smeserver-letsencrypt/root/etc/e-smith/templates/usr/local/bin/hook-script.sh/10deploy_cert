@@ -7,9 +7,34 @@
 
     my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' ) || 'disabled';
 
+    my $version = $configDB->get_prop( 'sysconfig', 'ReleaseVersion' );
+
+    $version = substr( $version, 0, 1 );
+
     if ( $letsencryptStatus ne 'disabled' ) {
 
-    $OUT .= <<'_EOF';
+        if ( $version == 8 ) {
+            $OUT .= <<'_EOF';
+    
+    if [ $1 = "deploy_cert" ]; then
+      KEY=$3
+      CERT=$4
+      CHAIN=$6
+      echo "Set up modSSL db keys"
+      /sbin/e-smith/db configuration setprop modSSL key $KEY
+      /sbin/e-smith/db configuration setprop modSSL crt $CERT
+      /sbin/e-smith/db configuration setprop modSSL CertificateChainFile $CHAIN
+      echo "Signal events"
+      /sbin/e-smith/signal-event domain-modify
+      /sbin/e-smith/signal-event email-update
+      /sbin/e-smith/signal-event ibay-modify
+      echo "All complete"
+    fi
+_EOF
+        }
+        else {
+
+            $OUT .= <<'_EOF';
     
     if [ $1 = "deploy_cert" ]; then
       KEY=$3
@@ -24,5 +49,6 @@
       echo "All complete"
     fi
 _EOF
+        }
     }
 }

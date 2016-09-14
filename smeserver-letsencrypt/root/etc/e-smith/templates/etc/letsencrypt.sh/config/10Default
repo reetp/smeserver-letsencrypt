@@ -8,10 +8,15 @@
     my $letsencryptStatus = $configDB->get_prop( 'letsencrypt', 'status' )
       || 'disabled';
 
+    my $letsencryptLicence = $configDB->get_prop( 'letsencrypt', 'licence' )
+      || '';
+      
     $OUT .= "#!/bin/bash\n";
 
     $OUT .=
 "WELLKNOWN=\"/home/e-smith/files/ibays/Primary/html/.well-known/acme-challenge\"\n";
+
+
 
     if ( $letsencryptStatus eq 'test' ) {
 
@@ -49,6 +54,10 @@
         $OUT .= "CONTACT_EMAIL=$letsencryptEmail\n";
     }
 
+    if ( $letsencryptLicence ne '' ) {
+        $OUT .= "LICENCE=\"$letsencryptLicence\"\n";
+    }
+        
     # Hook Script always enabled
     $OUT .= "HOOK=\"/usr/local/bin/hook-script.sh\"\n";
 
