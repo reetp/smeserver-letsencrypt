@@ -197,7 +197,7 @@ chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 echo "###################################################################"
 echo ""
 echo "************************************************************"
-echo " NOTE ! letsencrypt.sh has had to be renamed to 'dehydrated'
+echo " NOTE ! letsencrypt.sh has had to be renamed to 'dehydrated'"
 echo "************************************************************"
 echo ""
 echo "# After install please set your db keys"
