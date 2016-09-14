@@ -1,5 +1,14 @@
 # smeserver-letsencrypt
+
 A contrib to use letsencrypt certificates on Koozali SME Server
+
+Note that we call this contrib 'smeserver-letsencrypt because it installs letsencrypt support
+
+Also note that due to either ignorance or stupidity by people or peoples unknown at LE, the script that this plugin uses has had to be renamed from letsencrypt.sh to dehydrated.
+
+I can only presume that money talks and LE enforced some copyright madness on the script name.
+
+Whatever next ? I can't use feckbook.sh to remove feckbook crap out of a system for instance ? I digress.
 
 yum --enablerepo=reetp install smeserver-letsencrypt
 
