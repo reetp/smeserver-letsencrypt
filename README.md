@@ -10,6 +10,7 @@ signal-event post-upgrade;signal-event reboot
 Set the letsencrypt service
 
 This can have one of 3 states. Make sure you set to test until you are sure of you have everything correct to avoid overloading the service
+
 config setprop letsencrypt status disabled | enabled | test
 
 First set it to test
