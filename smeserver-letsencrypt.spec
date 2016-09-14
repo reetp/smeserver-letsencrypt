@@ -1,19 +1,19 @@
 %define name smeserver-letsencrypt
-%define version 0.2
-%define release 10
+%define version 0.3
+%define release 1
 Summary: Plugin to enable letsencrypt certificates
 Name: %{name}
 Version: %{version}
 Release: %{release}
 License: GNU GPL version 2
-URL: http://libreswan.org/
+URL: https://letsencrypt.org/
 Group: SMEserver/addon
 Source: %{name}-%{version}.tar.gz
 BuildRoot: /var/tmp/%{name}-%{version}
 BuildArchitectures: noarch
 BuildRequires: e-smith-devtools
 Requires: e-smith-release >= 8.0
-Requires: letsencrypt.sh >= 0.0.9
+Requires: dehydrated >= 0.3.1
 AutoReqProv: no
 
 %description
@@ -21,8 +21,14 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
+* Wed Sep 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.3-1
+- Due to madness at letsencrypt the script had to be renamed for copyright reasons
+- move /etc/letsencrypt.sh to /etc/dehydrated
+- change references to letsencrypt.sh to dehydrated
+- Fix typos in readme
+
 * Wed Aug 3 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-10
-- Some tweaks from JPP for the domains.tx file
+- Some tweaks from JPP for the domains.txt file
 
 * Wed Aug 3 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.2-9
 - Fix version differences with between v8 and v9
@@ -57,7 +63,7 @@ https://letsencrypt.org/
 - Remove letsencrypt.sh script and put in separate RPM
 
 * Tue Mar 29 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-21
-- modify hook script templates as per Dan Browns contribution
+- modify hook script templates as per Dan Browd contribution
 
 * Thu Mar 17 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.1-20
 - updated letsencrypt.sh
@@ -161,15 +167,11 @@ rm -rf %{name}-%{version}
 
 %post
 if [[ ! -e /etc/letsencrypt.sh ]];
-then mkdir /etc/letsencrypt.sh;
+then mv -f /etc/letsencrypt.sh /etc/letsencrypt.sh.old;
 fi
 
-if [[ -f /etc/letsencrypt.sh/config.sh ]];
-then mv -f /etc/letsencrypt.sh/config.sh /etc/letsencrypt.sh/config.sh.old;
-fi
-
-if [[ -f /etc/letsencrypt.sh/config ]];
-then mv -f /etc/letsencrypt.sh/config /etc/letsencrypt.sh/config.old;
+if [[ ! -e /etc/dehydrated ]];
+then mkdir /etc/dehydrated;
 fi
 
 if [[ -f /usr/local/bin/config.sh ]];
@@ -193,19 +195,24 @@ chown -R apache:shared /home/e-smith/files/ibays/Primary/html/.well-known
 
 
 echo "###################################################################"
+echo ""
+echo "************************************************************"
+echo " NOTE ! letsencrypt.sh has had to be renamed to 'dehydrated'
+echo "************************************************************"
+echo ""
 echo "# After install please set your db keys"
 echo "# Make sure you set the letsencrypt status key to test"
 echo "# Enable some domains or hosts"
 echo "# Then run the following"
 echo "# signal-event console-save"
-echo "# letsencrypt.sh -c"
+echo "# dehydrated -c"
 echo "# Once you are satisfied set the letsencrypt status key to enabled"
-echo "# mv /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test"
-echo "# Run the letesencypt.sh file again to generate your keys"
+echo "# mv /etc/dehydrated/private_key.pem /etc/dehydrated/private_key.test"
+echo "# Run the dehydrated file again to generate your keys"
 echo "# signal-event console-save"
-echo "# letsencrypt.sh -c -x"
+echo "# dehydrated -c -x"
 echo "# Thereafter only use"
-echo "# letsencrypt.sh -c"
+echo "# dehydrated -c"
 echo "# If you make any key changes run console-save first"
 echo "###################################################################"
 

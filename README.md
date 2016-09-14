@@ -10,15 +10,15 @@ signal-event post-upgrade;signal-event reboot
 Set the letsencrypt service
 
 This can have one of 3 states. Make sure you set to test until you are sure of you have everything correct to avoid overloading the service
-config setprop letsencypt status disabled | enabled | test
+config setprop letsencrypt status disabled | enabled | test
 
 First set it to test
 config setprop letsencrypt status test
 
 Optional keys - (not required)
 
-config setprop letsencypt email (defaults to empty)  
-config setprop letsencypt keysize (defaults to 4096)
+config setprop letsencrypt email (defaults to empty)  
+config setprop letsencrypt keysize (defaults to 4096)
 
 If the licence changes before this script is updated you can specify a new licence URL:
 config setprop letsencrypt licence https://letsencrypt.org/documents/LE-SA-v1.0.1-July-27-2015.pdf
@@ -44,7 +44,7 @@ signal-event console-save
 
 Create test certificates (file is in the path so should be OK)
 
-letsencrypt.sh -c
+dehydrated -c
 
 Once you are satisfied with your test
 
@@ -54,13 +54,13 @@ signal-event console-save
 
 and
 
-mv /etc/letsencrypt.sh/private_key.pem /etc/letsencrypt.sh/private_key.test
+mv /etc/dehydrated/private_key.pem /etc/dehydrated/private_key.test
 
-letsencrypt.sh -c -x
+dehydrated -c -x
 
 Note thereafter you ONLY need to run
 
-letsencrypt.sh -c
+dehydrated -c
 
 If you make any db key changes run console-save to regenerate your config files
 
