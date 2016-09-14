@@ -10,7 +10,7 @@
     if ( $letsencryptStatus eq 'enabled' ) {
 
         $OUT .= "#!/bin/sh\n\n";
-        $OUT .= "/usr/local/bin/letsencrypt.sh -c 2>&1 > /dev/null";
+        $OUT .= "/usr/local/bin/dehydrated -c 2>&1 > /dev/null";
     }
 
     else {

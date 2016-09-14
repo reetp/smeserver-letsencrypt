@@ -6,8 +6,8 @@ use esmith::Build::CreateLinks qw(:all);
 # letsencrypt-update
 
 foreach (qw(
-       /etc/letsencrypt.sh/domains.txt
-       /etc/letsencrypt.sh/config
+       /etc/dehydrated/domains.txt
+       /etc/dehydrated/config
        /usr/local/bin/hook-script.sh
     ))
 {
