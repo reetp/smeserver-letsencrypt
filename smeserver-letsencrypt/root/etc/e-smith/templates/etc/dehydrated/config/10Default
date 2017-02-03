@@ -59,6 +59,6 @@
     }
         
     # Hook Script always enabled
-    $OUT .= "HOOK=\"/usr/local/bin/hook-script.sh\"\n";
+    $OUT .= "HOOK=\"/usr/bin/hook-script.sh\"\n";
 
 }

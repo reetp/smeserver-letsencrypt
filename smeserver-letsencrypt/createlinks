@@ -8,7 +8,7 @@ use esmith::Build::CreateLinks qw(:all);
 foreach (qw(
        /etc/dehydrated/domains.txt
        /etc/dehydrated/config
-       /usr/local/bin/hook-script.sh
+       /usr/bin/hook-script.sh
     ))
 {
     templates2events("$_", qw(
