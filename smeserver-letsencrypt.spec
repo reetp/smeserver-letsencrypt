@@ -21,9 +21,9 @@ Lets Encrypt is a free, automated, and open certificate authority
 https://letsencrypt.org/
 
 %changelog
-* Sat Feb 04 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.4-1
+* Sat Feb 04 2017 John Crisp <jcrisp@safeandsoundit.co.uk> 0.4-1
  - first attempt at using stock letsencrypt script
- 
+
 * Wed Sep 14 2016 John Crisp <jcrisp@safeandsoundit.co.uk> 0.3-1
 - Due to madness at letsencrypt the script had to be renamed for copyright reasons
 - move /etc/letsencrypt.sh to /etc/dehydrated
